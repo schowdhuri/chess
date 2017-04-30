@@ -1,0 +1,34 @@
+{
+    "name":"Cube.001Geometry.1",
+    "uvs":[],
+    "vertices":[-4.42052,-1,1,-4.42052,1,1,-4.42052,-1,-1,-4.42052,1,-1,-2.42052,-1,1,-2.42052,1,1,-2.42052,-1,-1,-2.42052,1,-1],
+    "metadata":{
+        "uvs":0,
+        "vertices":8,
+        "normals":8,
+        "type":"Geometry",
+        "materials":1,
+        "version":3,
+        "faces":6,
+        "generator":"io_three"
+    },
+    "normals":[-0.577349,-0.577349,0.577349,-0.577349,0.577349,0.577349,-0.577349,0.577349,-0.577349,-0.577349,-0.577349,-0.577349,0.577349,0.577349,-0.577349,0.577349,-0.577349,-0.577349,0.577349,0.577349,0.577349,0.577349,-0.577349,0.577349],
+    "materials":[{
+        "visible":true,
+        "DbgIndex":0,
+        "DbgName":"Marble.White.01",
+        "shading":"phong",
+        "DbgColor":15658734,
+        "specularCoef":256,
+        "colorSpecular":[0.25,0.25,0.25],
+        "depthWrite":true,
+        "wireframe":false,
+        "colorDiffuse":[0.642176,0.550009,0.442668],
+        "transparent":false,
+        "blending":"NormalBlending",
+        "depthTest":true,
+        "opacity":1,
+        "colorEmissive":[0,0,0]
+    }],
+    "faces":[35,0,1,3,2,0,0,1,2,3,35,2,3,7,6,0,3,2,4,5,35,6,7,5,4,0,5,4,6,7,35,1,0,4,5,0,1,0,7,6,35,4,0,2,6,0,7,0,3,5,35,7,3,1,5,0,4,2,1,6]
+}

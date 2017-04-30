@@ -1,0 +1,34 @@
+{
+    "name":"Cube.003Geometry.1",
+    "metadata":{
+        "version":3,
+        "normals":8,
+        "generator":"io_three",
+        "uvs":0,
+        "vertices":8,
+        "type":"Geometry",
+        "faces":6,
+        "materials":1
+    },
+    "normals":[-0.577349,-0.577349,0.577349,-0.577349,0.577349,0.577349,-0.577349,0.577349,-0.577349,-0.577349,-0.577349,-0.577349,0.577349,0.577349,-0.577349,0.577349,-0.577349,-0.577349,0.577349,0.577349,0.577349,0.577349,-0.577349,0.577349],
+    "faces":[35,0,1,3,2,0,0,1,2,3,35,2,3,7,6,0,3,2,4,5,35,6,7,5,4,0,5,4,6,7,35,1,0,4,5,0,1,0,7,6,35,4,0,2,6,0,7,0,3,5,35,7,3,1,5,0,4,2,1,6],
+    "uvs":[],
+    "vertices":[1.49669,-1,1,1.49669,1,1,1.49669,-1,-1,1.49669,1,-1,3.49669,-1,1,3.49669,1,1,3.49669,-1,-1,3.49669,1,-1],
+    "materials":[{
+        "shading":"phong",
+        "blending":"NormalBlending",
+        "specularCoef":10,
+        "colorSpecular":[0.1,0.1,0.1],
+        "DbgIndex":0,
+        "transparent":false,
+        "DbgColor":15658734,
+        "opacity":1,
+        "depthWrite":true,
+        "DbgName":"Board.Black",
+        "visible":true,
+        "colorDiffuse":[0.103023,0.058695,0.031941],
+        "colorEmissive":[0,0,0],
+        "wireframe":false,
+        "depthTest":true
+    }]
+}
