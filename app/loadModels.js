@@ -61,7 +61,7 @@ const loadModels = (scene, scaleFactor) => {
                 color = color=="WHITE" ? "BLACK" : "WHITE";
                 for(let j=8; j>=1; j--) {
                     const model = new Mesh(geo, color=="WHITE" ? boardWhiteMat.clone() : boardBlackMat.clone());
-                    model.position.set(-7 + (j-1)*2, 0, 7-(i-1)*2);
+                    model.position.set(-7*scaleFactor + (j-1)*2*scaleFactor, 0, 7*scaleFactor - (i-1)*2*scaleFactor);
                     model.receiveShadow = true;
                     model.scale.set(scaleFactor, scaleFactor, scaleFactor);
                     scene.add(model);

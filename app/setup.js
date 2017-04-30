@@ -30,11 +30,15 @@ const OrbitControls = OrbitControlsFactory({
 });
 
 const setup = () => {
+    const scaleFactor = window.innerWidth < window.innerHeight
+        ? window.innerWidth / 1330
+        : 1;
+
     const scene = new Scene();
 
     // Setup the camera
     const camera = new PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
-    camera.position.z = 22;
+    camera.position.z = 14 + 8 * scaleFactor;
     camera.position.y = 8;
 
     const orbitControl = new OrbitControls(camera);
@@ -47,9 +51,6 @@ const setup = () => {
     renderer.shadowMap.type = PCFSoftShadowMap;
     document.getElementById("container").appendChild(renderer.domElement);
 
-    const scaleFactor = window.innerWidth < window.innerHeight
-        ? window.innerWidth / 1330
-        : 1;
 
 
     const ambientLight = new AmbientLight(0x808081, 1.5);
