@@ -3,10 +3,10 @@ import loadModels from "./loadModels";
 import setupEvents from "./interaction";
 
 const {
-	scene,
-	scaleFactor,
-	renderer,
-	camera
+    scene,
+    scaleFactor,
+    renderer,
+    camera
 } = setup();
 
 const { pieces } = loadModels(scene, scaleFactor);

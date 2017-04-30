@@ -1,9 +1,9 @@
 import { Raycaster } from "three";
 
 class Pieces {
-	constructor() {
-		this._pieces = [];
-	}
+    constructor() {
+        this._pieces = [];
+    }
     add(p) {
         this._pieces.push({
             object: p.object,
