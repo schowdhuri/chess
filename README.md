@@ -2,6 +2,9 @@
 Two-player Chess for the browser built with Blender + threejs.
 Work in progress :construction:
 
+## Demo
+[https://rawgit.com/schowdhuri/chess/master/index.html](https://rawgit.com/schowdhuri/chess/master/index.html)
+
 ### Warning
 Bloated, unoptimized 3D models!
 
@@ -16,11 +19,11 @@ Bloated, unoptimized 3D models!
 - [x] Move to npm + webpack build
 - [ ] Move validation
 - [ ] Moving and capturing
-- [ ] WebRTC
+- [ ] Add preloader
 - [ ] Optimize geometry
 - [ ] Better materials
 - [ ] Improve lights
-
+- [ ] 2-player gameplay
 
 ## License
 
