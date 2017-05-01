@@ -1,9 +1,10 @@
-class BoardBlock {
+class Block {
     constructor(b) {
+        this.id = b.object.uuid;
         this.object = b.object;
         this.color = b.color;
         this.position = b.position
-        this.isOccupied = false;
+        this.piece = null;
     }
     getPos() {
         return {
@@ -22,8 +23,11 @@ class BoardBlock {
         }
     }
     setPiece(piece) {
-        this.piece = piece;
-        this.isOccupied = true;
+        if(piece) {
+            this.piece = piece;
+        } else {
+            this.piece = null;
+        }
     }
     highlight(on=true) {
         if(on) {
@@ -35,4 +39,4 @@ class BoardBlock {
     }
 }
 
-export default BoardBlock;
+export default Block;

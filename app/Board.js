@@ -37,6 +37,15 @@ class Board {
             return pieceUnderMouse;
         }
     }
+    findBlockUnderMouse(mousePos, camera) {
+        const raycaster = new Raycaster();
+        raycaster.setFromCamera(mousePos, camera);
+        const intersected = raycaster.intersectObjects(this._block.map(b => b.object));
+        if(intersected.length) {
+            const blockUnderMouse = this._block.find(b => b.id===intersected[0].object.uuid);
+            return blockUnderMouse;
+        }
+    }
     getBlock() {
         const args = Array.prototype.slice.call(arguments);
         return this._block.find(b => b.isAt.apply(b, args));
@@ -52,6 +61,19 @@ class Board {
         const possibleMoves = piece.getPossibleMoves();
         possibleMoves.forEach(pos => {
             this.getBlock(pos).highlight();
+        });
+    }
+    move({ piece, block }, toBlock) {
+        const toX = toBlock.object.position.x;
+        const toY = toBlock.object.position.y;
+        const toZ = toBlock.object.position.z;
+        block.setPiece(null);
+        return new Promise((fulfill, reject) => {
+            piece.object.position.set(toX, toY, toZ);
+            toBlock.setPiece(piece);
+            // block.getPos().row
+            // block.getPos().col
+            fulfill();
         });
     }
 }
