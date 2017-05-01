@@ -45958,6 +45958,10 @@ var _Piece = __webpack_require__(23);
 
 var _Piece2 = _interopRequireDefault(_Piece);
 
+var _animatePiece = __webpack_require__(25);
+
+var _animatePiece2 = _interopRequireDefault(_animatePiece);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -46084,6 +46088,38 @@ var Board = function () {
                 return p[0] == dest.row && p[1] == dest.col;
             }));
         }
+        // move({ piece, block }, toBlock) {
+        //     const rowDelta = toBlock.getPos().row - block.getPos().row;
+        //     const colDelta = toBlock.getPos().col - block.getPos().col;
+
+        //     const movement = new Vector3(colDelta * 2, 0, -rowDelta * 2);
+        //     return new Promise((fulfill, reject) => {
+        //         piece.object.position.add(movement);
+        //         piece.setPos(toBlock.getPos());
+        //         block.setPiece(null);
+
+        //         if(toBlock.piece && toBlock.piece.player != piece.player) {
+        //             // capture
+        //             toBlock.piece.isCaptured = true;
+        //             if(piece.player=="WHITE") {
+        //                 toBlock.piece.object.position.set(
+        //                     -Math.floor(Math.random() * 10) - 12,
+        //                     0,
+        //                     Math.floor(Math.random() * 5) + 5
+        //                 );
+        //             } else {
+        //                 toBlock.piece.object.position.set(
+        //                     -Math.floor(Math.random() * 10) - 12,
+        //                     0,
+        //                     -(Math.floor(Math.random() * 5) + 5)
+        //                 );
+        //             }
+        //         }
+        //         toBlock.setPiece(piece);
+        //         fulfill();
+        //     });
+        // }
+
     }, {
         key: "move",
         value: function move(_ref2, toBlock) {
@@ -46093,12 +46129,16 @@ var Board = function () {
             var rowDelta = toBlock.getPos().row - block.getPos().row;
             var colDelta = toBlock.getPos().col - block.getPos().col;
 
-            var movement = new _three.Vector3(colDelta * 2, 0, -rowDelta * 2);
+            var dest = [piece.object.position.x + colDelta * 2, piece.object.position.y, piece.object.position.z - rowDelta * 2];
             return new Promise(function (fulfill, reject) {
-                piece.object.position.add(movement);
-                piece.setPos(toBlock.getPos());
-                block.setPiece(null);
-
+                console.log("MOVING: ", piece.object.position, " TO: ", dest);
+                (0, _animatePiece2.default)(piece, dest).then(function () {
+                    piece.setPos(toBlock.getPos());
+                    block.setPiece(null);
+                    toBlock.setPiece(piece);
+                    console.log("MOVED: ", piece.object.position);
+                    fulfill();
+                });
                 if (toBlock.piece && toBlock.piece.player != piece.player) {
                     // capture
                     toBlock.piece.isCaptured = true;
@@ -46108,8 +46148,6 @@ var Board = function () {
                         toBlock.piece.object.position.set(-Math.floor(Math.random() * 10) - 12, 0, -(Math.floor(Math.random() * 5) + 5));
                     }
                 }
-                toBlock.setPiece(piece);
-                fulfill();
             });
         }
     }]);
@@ -46552,6 +46590,70 @@ var patterns = {
 };
 
 exports.default = patterns;
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var TOTAL_TIME = 300; // ms
+
+// const distance = (piece, dest) => {
+//     return Math.sqrt(
+//         Math.pow(piece.object.position.x - dest[0], 2) +
+//         Math.pow(piece.object.position.z - dest[2], 2)
+//     );
+// };
+
+var animatePiece = function animatePiece(piece, dest) {
+    var startTime = new Date().getTime();
+    var x = piece.object.position.x;
+    var y = piece.object.position.y;
+    var z = piece.object.position.z;
+    var deltaX = dest[0] - x;
+    var deltaZ = dest[2] - z;
+    return new Promise(function (fulfill, reject) {
+        var incrementalAnim = function incrementalAnim() {
+            var dt = new Date().getTime() - startTime;
+            var dx = deltaX * dt / TOTAL_TIME;
+            var dz = deltaZ * dt / TOTAL_TIME;
+            piece.object.position.set(x + dx, y, z + dz);
+            if (dt < TOTAL_TIME) requestAnimationFrame(incrementalAnim);else fulfill();
+        };
+        incrementalAnim();
+    });
+};
+
+// const animatePiece = (piece, dest) => {
+//     const startTime = (new Date()).getTime();
+//     const { x, y, z } = piece.object.position;
+//     const d = distance(piece, dest);
+//     const h = d/2; // lets roll with this for now
+//     const theta = Math.atan(4*h/d);
+//     const g = 10;
+//     const v0 = g * TOTAL_TIME / (2 * Math.sin(theta));
+//     return new Promise((fulfill, reject) => {
+//         const incrementalAnim = () => {
+//             const dt = (new Date()).getTime() - startTime;
+//             const dx = v0 * Math.cos(theta);
+//             const dy = v0 * Math.sin(theta) - 0.5 * g * dt * dt;
+
+//             piece.object.position.set(x + dx, y + dy, z + dz);
+//             if(dt < TOTAL_TIME)
+//                 requestAnimationFrame(incrementalAnim);
+//             else
+//                 fulfill();
+//         };
+//         incrementalAnim();
+//     });
+// };
+
+exports.default = animatePiece;
 
 /***/ })
 /******/ ]);
