@@ -4,13 +4,14 @@ import {
     Mesh
 } from "three";
 
-import Pieces from "./Pieces";
+import Board from "./Board";
+import BoardBlock from "./BoardBlock";
+import Piece from "./Piece";
 
 const loadModels = (scene, scaleFactor) => {
     const loader = new JSONLoader();
 
     // Start loading models
-    const block = [];
     const blackBoardMatLoaded = new Promise((fulfill, reject) => {
         loader.load( "models/boardBlack.json", (geo, mat) => {
             const material = new MeshFaceMaterial(mat);
@@ -46,50 +47,52 @@ const loadModels = (scene, scaleFactor) => {
         blackMatLoaded
     ]);
 
-    const pieces = new Pieces();
+    const board = new Board();
+    window.board = board;
 
     matsLoaded.then(materials => {
         const boardBlackMat = materials[0][0];
         const boardWhiteMat = materials[1][0];
-        const whiteMat = materials[2][0];
-        const blackMat = materials[3][0];
         
-        loader.load( "models/boardBlock.json", (geo, mat) => {
-            let color;
-            for(let i=1; i<=8; i++) {
-                block[i-1] = [];
-                color = color=="WHITE" ? "BLACK" : "WHITE";
-                for(let j=8; j>=1; j--) {
-                    const model = new Mesh(geo, color=="WHITE" ? boardWhiteMat.clone() : boardBlackMat.clone());
-                    model.position.set(-7*scaleFactor + (j-1)*2*scaleFactor, 0, 7*scaleFactor - (i-1)*2*scaleFactor);
-                    model.receiveShadow = true;
-                    model.scale.set(scaleFactor, scaleFactor, scaleFactor);
-                    scene.add(model);
-                    block[i-1][j-1] = {
-                        object: model,
-                        color: color
-                    };
+        return new Promise((fulfill, reject) => {
+            loader.load( "models/boardBlock.json", (geo, mat) => {
+                let color;
+                for(let i=1; i<=8; i++) {
                     color = color=="WHITE" ? "BLACK" : "WHITE";
+                    for(let j=8; j>=1; j--) {
+                        const model = new Mesh(geo, color=="WHITE" ? boardWhiteMat.clone() : boardBlackMat.clone());
+                        model.position.set(-7*scaleFactor + (j-1)*2*scaleFactor, 0, 7*scaleFactor - (i-1)*2*scaleFactor);
+                        model.receiveShadow = true;
+                        model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+                        scene.add(model);
+                        board.add(new BoardBlock({
+                            object: model,
+                            color: color,
+                            position: [i-1, j-1]
+                        }));
+                        color = color=="WHITE" ? "BLACK" : "WHITE";
+                    }
                 }
-            }
-        });
-
+                fulfill([ materials[2], materials[3] ]);
+            });
+        })
+    }).then(materials => {
+        const whiteMat = materials[0][0];
+        const blackMat = materials[1][0];
+    
         loader.load("models/pawn.json", (geo, mat) => {
-            const movementPattern = () => {
-
-            };
             for(let i=1; i<=8; i++) {
                 const pawn = new Mesh(geo, whiteMat.clone());
                 pawn.position.set((i-1) * 2.005*scaleFactor, 0, 0);
                 pawn.castShadow = true;
                 pawn.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(pawn);
-                pieces.add({
+                board.add(new Piece({
                     player: "WHITE",
                     name: "PAWN",
                     object: pawn,
                     position: [1, i-1]
-                });
+                }));
             }
             for(let i=1; i<=8; i++) {
                 const pawn = new Mesh(geo, blackMat.clone());
@@ -97,12 +100,12 @@ const loadModels = (scene, scaleFactor) => {
                 pawn.castShadow = true;
                 pawn.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(pawn);
-                pieces.add({
+                board.add(new Piece({
                     player: "BLACK",
                     name: "PAWN",
                     object: pawn,
-                    position: [6, i]
-                });
+                    position: [6, i-1]
+                }));
             }
         });
 
@@ -113,12 +116,12 @@ const loadModels = (scene, scaleFactor) => {
                 rook.castShadow = true;
                 rook.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(rook);
-                pieces.add({
+                board.add(new Piece({
                     player: "WHITE",
                     name: "ROOK",
                     object: rook,
                     position: [0, (i-1)*7]
-                });
+                }));
             }
             for(let i=1; i<=2; i++) {
                 const rook = new Mesh(geo, blackMat.clone());
@@ -126,12 +129,12 @@ const loadModels = (scene, scaleFactor) => {
                 rook.castShadow = true;
                 rook.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(rook);
-                pieces.add({
+                board.add(new Piece({
                     player: "BLACK",
                     name: "ROOK",
                     object: rook,
                     position: [7, (i-1)*7]
-                });
+                }));
             }
         });
 
@@ -142,12 +145,12 @@ const loadModels = (scene, scaleFactor) => {
                 knight.castShadow = true;
                 knight.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(knight);
-                pieces.add({
+                board.add(new Piece({
                     player: "WHITE",
                     name: "KNIGHT",
                     object: knight,
                     position: [0, 1 + (i-1)*5]
-                });
+                }));
             }
             for(let i=1; i<=2; i++) {
                 const knight = new Mesh(geo, blackMat.clone());
@@ -155,12 +158,12 @@ const loadModels = (scene, scaleFactor) => {
                 knight.castShadow = true;
                 knight.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(knight);
-                pieces.add({
+                board.add(new Piece({
                     player: "BLACK",
                     name: "KNIGHT",
                     object: knight,
                     position: [7, 1 + (i-1)*5]
-                });
+                }));
             }
         });
 
@@ -171,12 +174,12 @@ const loadModels = (scene, scaleFactor) => {
                 bishop.castShadow = true;
                 bishop.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(bishop);
-                pieces.add({
+                board.add(new Piece({
                     player: "WHITE",
                     name: "BISHOP",
                     object: bishop,
                     position: [0, 2 + (i-1)*4]
-                });
+                }));
             }
             for(let i=1; i<=2; i++) {
                 const bishop = new Mesh(geo, blackMat.clone());
@@ -184,12 +187,12 @@ const loadModels = (scene, scaleFactor) => {
                 bishop.castShadow = true;
                 bishop.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(bishop);
-                pieces.add({
+                board.add(new Piece({
                     player: "BLACK",
                     name: "BISHOP",
                     object: bishop,
                     position: [7, 2 + (i-1)*4]
-                });
+                }));
             }
         });
 
@@ -199,24 +202,24 @@ const loadModels = (scene, scaleFactor) => {
             queen.castShadow = true;
             queen.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(queen);
-            pieces.add({
+            board.add(new Piece({
                 player: "WHITE",
                 name: "QUEEN",
                 object: queen,
                 position: [0, 3]
-            });
+            }));
             
             const queen2 = new Mesh(geo, blackMat.clone());
             queen2.position.set(0, 0, -14 * scaleFactor);
             queen2.castShadow = true;
             queen2.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(queen2);
-            pieces.add({
+            board.add(new Piece({
                 player: "BLACK",
                 name: "QUEEN",
                 object: queen2,
                 position: [7, 3]
-            });
+            }));
         });
 
         loader.load("models/king.json", (geo, mat) => {
@@ -225,29 +228,28 @@ const loadModels = (scene, scaleFactor) => {
             king.castShadow = true;
             king.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(king);
-            pieces.add({
+            board.add(new Piece({
                 player: "WHITE",
                 name: "KING",
                 object: king,
                 position: [0, 4]
-            });
+            }));
 
             const king2 = new Mesh(geo, blackMat.clone());
             king2.position.set(0, 0, -14 * scaleFactor);
             king2.castShadow = true;
             king2.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(king2);
-            pieces.add({
+            board.add(new Piece({
                 player: "BLACK",
                 name: "KING",
                 object: king2,
                 position: [7, 4]
-            });
+            }));
         });
-        
     });
     return {
-        pieces
+        board
     };
 };
 

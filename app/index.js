@@ -9,7 +9,7 @@ const {
     camera
 } = setup(document.getElementById("container"));
 
-const { pieces } = loadModels(scene, scaleFactor);
+const { board } = loadModels(scene, scaleFactor);
 
 const render = () => {
     requestAnimationFrame(render);
@@ -17,6 +17,6 @@ const render = () => {
 };
 render();
 
-window.pieces = pieces;
+window.board = board;
 
-setupEvents(pieces, camera);
+setupEvents(board, camera);

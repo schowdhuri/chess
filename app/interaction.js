@@ -1,7 +1,7 @@
 import { Vector2 } from "three";
 import throttle from "lodash/throttle";
 
-const setupInteraction = (pieces, camera) => {
+const setupInteraction = (board, camera) => {
     let mouseDragTimer;
     let mousePressed = false;
     let dragging = false;
@@ -24,7 +24,7 @@ const setupInteraction = (pieces, camera) => {
             const mousePos = new Vector2();
             mousePos.x = ev.clientX / window.innerWidth * 2 -1;
             mousePos.y = -(ev.clientY / window.innerHeight * 2 -1);
-            const clickedPiece = pieces.findPieceUnderMouse(mousePos, camera);
+            const clickedPiece = board.findPieceUnderMouse(mousePos, camera);
         }
     }, false);
 
@@ -34,13 +34,13 @@ const setupInteraction = (pieces, camera) => {
         const mousePos = new Vector2();
         mousePos.x = ev.clientX / window.innerWidth * 2 -1;
         mousePos.y = -(ev.clientY / window.innerHeight * 2 -1);
-        const piece = pieces.findPieceUnderMouse(mousePos, camera);
+        const piece = board.findPieceUnderMouse(mousePos, camera);
         if(piece) {
             document.body.style.cursor = "pointer";
-            pieces.highlight(piece);
+            board.highlight(piece);
         } else if(document.body.style.cursor=="pointer") {
             document.body.style.cursor = "default";
-            pieces.unhighlightAll();
+            board.unhighlightAll();
         }
     }, 300));
 };

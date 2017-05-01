@@ -43832,7 +43832,7 @@ var _throttle2 = _interopRequireDefault(_throttle);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var setupInteraction = function setupInteraction(pieces, camera) {
+var setupInteraction = function setupInteraction(board, camera) {
     var mouseDragTimer = void 0;
     var mousePressed = false;
     var dragging = false;
@@ -43855,7 +43855,7 @@ var setupInteraction = function setupInteraction(pieces, camera) {
             var mousePos = new _three.Vector2();
             mousePos.x = ev.clientX / window.innerWidth * 2 - 1;
             mousePos.y = -(ev.clientY / window.innerHeight * 2 - 1);
-            var clickedPiece = pieces.findPieceUnderMouse(mousePos, camera);
+            var clickedPiece = board.findPieceUnderMouse(mousePos, camera);
         }
     }, false);
 
@@ -43864,13 +43864,13 @@ var setupInteraction = function setupInteraction(pieces, camera) {
         var mousePos = new _three.Vector2();
         mousePos.x = ev.clientX / window.innerWidth * 2 - 1;
         mousePos.y = -(ev.clientY / window.innerHeight * 2 - 1);
-        var piece = pieces.findPieceUnderMouse(mousePos, camera);
+        var piece = board.findPieceUnderMouse(mousePos, camera);
         if (piece) {
             document.body.style.cursor = "pointer";
-            pieces.highlight(piece);
+            board.highlight(piece);
         } else if (document.body.style.cursor == "pointer") {
             document.body.style.cursor = "default";
-            pieces.unhighlightAll();
+            board.unhighlightAll();
         }
     }, 300));
 };
@@ -43890,9 +43890,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _three = __webpack_require__(0);
 
-var _Pieces = __webpack_require__(7);
+var _Board = __webpack_require__(21);
 
-var _Pieces2 = _interopRequireDefault(_Pieces);
+var _Board2 = _interopRequireDefault(_Board);
+
+var _BoardBlock = __webpack_require__(22);
+
+var _BoardBlock2 = _interopRequireDefault(_BoardBlock);
+
+var _Piece = __webpack_require__(23);
+
+var _Piece2 = _interopRequireDefault(_Piece);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -43900,7 +43908,6 @@ var loadModels = function loadModels(scene, scaleFactor) {
     var loader = new _three.JSONLoader();
 
     // Start loading models
-    var block = [];
     var blackBoardMatLoaded = new Promise(function (fulfill, reject) {
         loader.load("models/boardBlack.json", function (geo, mat) {
             var material = new _three.MeshFaceMaterial(mat);
@@ -43931,48 +43938,52 @@ var loadModels = function loadModels(scene, scaleFactor) {
 
     var matsLoaded = Promise.all([blackBoardMatLoaded, whiteBoardMatLoaded, whiteMatLoaded, blackMatLoaded]);
 
-    var pieces = new _Pieces2.default();
+    var board = new _Board2.default();
+    window.board = board;
 
     matsLoaded.then(function (materials) {
         var boardBlackMat = materials[0][0];
         var boardWhiteMat = materials[1][0];
-        var whiteMat = materials[2][0];
-        var blackMat = materials[3][0];
 
-        loader.load("models/boardBlock.json", function (geo, mat) {
-            var color = void 0;
-            for (var i = 1; i <= 8; i++) {
-                block[i - 1] = [];
-                color = color == "WHITE" ? "BLACK" : "WHITE";
-                for (var j = 8; j >= 1; j--) {
-                    var model = new _three.Mesh(geo, color == "WHITE" ? boardWhiteMat.clone() : boardBlackMat.clone());
-                    model.position.set(-7 * scaleFactor + (j - 1) * 2 * scaleFactor, 0, 7 * scaleFactor - (i - 1) * 2 * scaleFactor);
-                    model.receiveShadow = true;
-                    model.scale.set(scaleFactor, scaleFactor, scaleFactor);
-                    scene.add(model);
-                    block[i - 1][j - 1] = {
-                        object: model,
-                        color: color
-                    };
+        return new Promise(function (fulfill, reject) {
+            loader.load("models/boardBlock.json", function (geo, mat) {
+                var color = void 0;
+                for (var i = 1; i <= 8; i++) {
                     color = color == "WHITE" ? "BLACK" : "WHITE";
+                    for (var j = 8; j >= 1; j--) {
+                        var model = new _three.Mesh(geo, color == "WHITE" ? boardWhiteMat.clone() : boardBlackMat.clone());
+                        model.position.set(-7 * scaleFactor + (j - 1) * 2 * scaleFactor, 0, 7 * scaleFactor - (i - 1) * 2 * scaleFactor);
+                        model.receiveShadow = true;
+                        model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+                        scene.add(model);
+                        board.add(new _BoardBlock2.default({
+                            object: model,
+                            color: color,
+                            position: [i - 1, j - 1]
+                        }));
+                        color = color == "WHITE" ? "BLACK" : "WHITE";
+                    }
                 }
-            }
+                fulfill([materials[2], materials[3]]);
+            });
         });
+    }).then(function (materials) {
+        var whiteMat = materials[0][0];
+        var blackMat = materials[1][0];
 
         loader.load("models/pawn.json", function (geo, mat) {
-            var movementPattern = function movementPattern() {};
             for (var i = 1; i <= 8; i++) {
                 var pawn = new _three.Mesh(geo, whiteMat.clone());
                 pawn.position.set((i - 1) * 2.005 * scaleFactor, 0, 0);
                 pawn.castShadow = true;
                 pawn.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(pawn);
-                pieces.add({
+                board.add(new _Piece2.default({
                     player: "WHITE",
                     name: "PAWN",
                     object: pawn,
                     position: [1, i - 1]
-                });
+                }));
             }
             for (var _i = 1; _i <= 8; _i++) {
                 var _pawn = new _three.Mesh(geo, blackMat.clone());
@@ -43980,12 +43991,12 @@ var loadModels = function loadModels(scene, scaleFactor) {
                 _pawn.castShadow = true;
                 _pawn.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(_pawn);
-                pieces.add({
+                board.add(new _Piece2.default({
                     player: "BLACK",
                     name: "PAWN",
                     object: _pawn,
-                    position: [6, _i]
-                });
+                    position: [6, _i - 1]
+                }));
             }
         });
 
@@ -43996,12 +44007,12 @@ var loadModels = function loadModels(scene, scaleFactor) {
                 rook.castShadow = true;
                 rook.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(rook);
-                pieces.add({
+                board.add(new _Piece2.default({
                     player: "WHITE",
                     name: "ROOK",
                     object: rook,
                     position: [0, (i - 1) * 7]
-                });
+                }));
             }
             for (var _i2 = 1; _i2 <= 2; _i2++) {
                 var _rook = new _three.Mesh(geo, blackMat.clone());
@@ -44009,12 +44020,12 @@ var loadModels = function loadModels(scene, scaleFactor) {
                 _rook.castShadow = true;
                 _rook.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(_rook);
-                pieces.add({
+                board.add(new _Piece2.default({
                     player: "BLACK",
                     name: "ROOK",
                     object: _rook,
                     position: [7, (_i2 - 1) * 7]
-                });
+                }));
             }
         });
 
@@ -44025,12 +44036,12 @@ var loadModels = function loadModels(scene, scaleFactor) {
                 knight.castShadow = true;
                 knight.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(knight);
-                pieces.add({
+                board.add(new _Piece2.default({
                     player: "WHITE",
                     name: "KNIGHT",
                     object: knight,
                     position: [0, 1 + (i - 1) * 5]
-                });
+                }));
             }
             for (var _i3 = 1; _i3 <= 2; _i3++) {
                 var _knight = new _three.Mesh(geo, blackMat.clone());
@@ -44038,12 +44049,12 @@ var loadModels = function loadModels(scene, scaleFactor) {
                 _knight.castShadow = true;
                 _knight.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(_knight);
-                pieces.add({
+                board.add(new _Piece2.default({
                     player: "BLACK",
                     name: "KNIGHT",
                     object: _knight,
                     position: [7, 1 + (_i3 - 1) * 5]
-                });
+                }));
             }
         });
 
@@ -44054,12 +44065,12 @@ var loadModels = function loadModels(scene, scaleFactor) {
                 bishop.castShadow = true;
                 bishop.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(bishop);
-                pieces.add({
+                board.add(new _Piece2.default({
                     player: "WHITE",
                     name: "BISHOP",
                     object: bishop,
                     position: [0, 2 + (i - 1) * 4]
-                });
+                }));
             }
             for (var _i4 = 1; _i4 <= 2; _i4++) {
                 var _bishop = new _three.Mesh(geo, blackMat.clone());
@@ -44067,12 +44078,12 @@ var loadModels = function loadModels(scene, scaleFactor) {
                 _bishop.castShadow = true;
                 _bishop.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(_bishop);
-                pieces.add({
+                board.add(new _Piece2.default({
                     player: "BLACK",
                     name: "BISHOP",
                     object: _bishop,
                     position: [7, 2 + (_i4 - 1) * 4]
-                });
+                }));
             }
         });
 
@@ -44082,24 +44093,24 @@ var loadModels = function loadModels(scene, scaleFactor) {
             queen.castShadow = true;
             queen.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(queen);
-            pieces.add({
+            board.add(new _Piece2.default({
                 player: "WHITE",
                 name: "QUEEN",
                 object: queen,
                 position: [0, 3]
-            });
+            }));
 
             var queen2 = new _three.Mesh(geo, blackMat.clone());
             queen2.position.set(0, 0, -14 * scaleFactor);
             queen2.castShadow = true;
             queen2.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(queen2);
-            pieces.add({
+            board.add(new _Piece2.default({
                 player: "BLACK",
                 name: "QUEEN",
                 object: queen2,
                 position: [7, 3]
-            });
+            }));
         });
 
         loader.load("models/king.json", function (geo, mat) {
@@ -44108,28 +44119,28 @@ var loadModels = function loadModels(scene, scaleFactor) {
             king.castShadow = true;
             king.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(king);
-            pieces.add({
+            board.add(new _Piece2.default({
                 player: "WHITE",
                 name: "KING",
                 object: king,
                 position: [0, 4]
-            });
+            }));
 
             var king2 = new _three.Mesh(geo, blackMat.clone());
             king2.position.set(0, 0, -14 * scaleFactor);
             king2.castShadow = true;
             king2.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(king2);
-            pieces.add({
+            board.add(new _Piece2.default({
                 player: "BLACK",
                 name: "KING",
                 object: king2,
                 position: [7, 4]
-            });
+            }));
         });
     });
     return {
-        pieces: pieces
+        board: board
     };
 };
 
@@ -44207,87 +44218,7 @@ var setup = function setup(container) {
 exports.default = setup;
 
 /***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _three = __webpack_require__(0);
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Pieces = function () {
-    function Pieces() {
-        _classCallCheck(this, Pieces);
-
-        this._pieces = [];
-    }
-
-    _createClass(Pieces, [{
-        key: "add",
-        value: function add(p) {
-            this._pieces.push({
-                object: p.object,
-                player: p.player,
-                name: p.name,
-                position: p.position
-            });
-        }
-    }, {
-        key: "unhighlightAll",
-        value: function unhighlightAll() {
-            this._pieces.forEach(function (p) {
-                return p.object.material.emissive.setHex(0x000000);
-            });
-        }
-    }, {
-        key: "highlight",
-        value: function highlight(piece) {
-            this.unhighlightAll();
-            this._pieces.forEach(function (p) {
-                if (p.object.uuid === piece.object.uuid) {
-                    var color = piece.player == "WHITE" ? 0x004400 : 0x009900;
-                    p.object.material.emissive.setHex(color);
-                }
-            });
-        }
-    }, {
-        key: "findPieceUnderMouse",
-        value: function findPieceUnderMouse(mousePos, camera) {
-            var raycaster = new _three.Raycaster();
-            raycaster.setFromCamera(mousePos, camera);
-            var intersected = raycaster.intersectObjects(this._pieces.map(function (p) {
-                return p.object;
-            }));
-            if (intersected.length) {
-                var pieceUnderMouse = this._pieces.find(function (p) {
-                    return p.object.uuid === intersected[0].object.uuid;
-                });
-                return pieceUnderMouse;
-            }
-        }
-    }, {
-        key: "at",
-        value: function at(row, col) {
-            return this._pieces.find(function (p) {
-                return p.position[0] == row && p.position[1] == col;
-            });
-        }
-    }]);
-
-    return Pieces;
-}();
-
-exports.default = Pieces;
-
-/***/ }),
+/* 7 */,
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -44315,7 +44246,7 @@ var _setup = (0, _setup3.default)(document.getElementById("container")),
     camera = _setup.camera;
 
 var _loadModels = (0, _loadModels3.default)(scene, scaleFactor),
-    pieces = _loadModels.pieces;
+    board = _loadModels.board;
 
 var render = function render() {
     requestAnimationFrame(render);
@@ -44323,9 +44254,9 @@ var render = function render() {
 };
 render();
 
-window.pieces = pieces;
+window.board = board;
 
-(0, _interaction2.default)(pieces, camera);
+(0, _interaction2.default)(board, camera);
 
 /***/ }),
 /* 9 */
@@ -45944,6 +45875,296 @@ try {
 
 module.exports = g;
 
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _three = __webpack_require__(0);
+
+var _BoardBlock = __webpack_require__(22);
+
+var _BoardBlock2 = _interopRequireDefault(_BoardBlock);
+
+var _Piece = __webpack_require__(23);
+
+var _Piece2 = _interopRequireDefault(_Piece);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Board = function () {
+    function Board() {
+        _classCallCheck(this, Board);
+
+        this._block = [];
+        this._pieces = [];
+    }
+
+    _createClass(Board, [{
+        key: "add",
+        value: function add(x) {
+            if (x instanceof _BoardBlock2.default) {
+                this._block.push(x);
+            } else if (x instanceof _Piece2.default) {
+                var block = this.getBlock(x.getPos());
+                this._pieces.push(x);
+                block.setPiece(x);
+            }
+        }
+    }, {
+        key: "unhighlightAll",
+        value: function unhighlightAll() {
+            this._pieces.forEach(function (p) {
+                return p.highlight(false);
+            });
+        }
+    }, {
+        key: "highlight",
+        value: function highlight(piece) {
+            this.unhighlightAll();
+            this._pieces.forEach(function (p) {
+                if (p.id === piece.id) {
+                    p.highlight(true);
+                }
+            });
+        }
+    }, {
+        key: "findPieceUnderMouse",
+        value: function findPieceUnderMouse(mousePos, camera) {
+            var raycaster = new _three.Raycaster();
+            raycaster.setFromCamera(mousePos, camera);
+            var intersected = raycaster.intersectObjects(this._pieces.map(function (p) {
+                return p.object;
+            }));
+            if (intersected.length) {
+                var pieceUnderMouse = this._pieces.find(function (p) {
+                    return p.id === intersected[0].object.uuid;
+                });
+                return pieceUnderMouse;
+            }
+        }
+    }, {
+        key: "getBlock",
+        value: function getBlock() {
+            var args = Array.prototype.slice.call(arguments);
+            return this._block.find(function (b) {
+                return b.isAt.apply(b, args);
+            });
+        }
+    }, {
+        key: "getPiece",
+        value: function getPiece(row, col) {
+            return this._pieces.find(function (p) {
+                return p.isAt({ row: row, col: col });
+            });
+        }
+    }]);
+
+    return Board;
+}();
+
+exports.default = Board;
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var BoardBlock = function () {
+    function BoardBlock(b) {
+        _classCallCheck(this, BoardBlock);
+
+        this.object = b.object;
+        this.color = b.color;
+        this.position = b.position;
+        this.isOccupied = false;
+    }
+
+    _createClass(BoardBlock, [{
+        key: "getPos",
+        value: function getPos() {
+            return {
+                row: this.position[0],
+                col: this.position[1]
+            };
+        }
+    }, {
+        key: "isAt",
+        value: function isAt() {
+            var args = Array.prototype.slice.call(arguments);
+            if (args[0] instanceof Array) {
+                return this.position[0] == args[0][0] && this.position[1] == args[0][1];
+            } else if (args[0] && args[0].row !== undefined && args[0].col !== undefined) {
+                return this.position[0] == args[0].row && this.position[1] == args[0].col;
+            } else {
+                return this.position[0] == args[0] && this.position[1] == args[1];
+            }
+        }
+    }, {
+        key: "setPiece",
+        value: function setPiece(piece) {
+            this.piece = piece;
+            this.isOccupied = true;
+        }
+    }]);
+
+    return BoardBlock;
+}();
+
+exports.default = BoardBlock;
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _movementPatterns = __webpack_require__(24);
+
+var _movementPatterns2 = _interopRequireDefault(_movementPatterns);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TYPES = Object.keys(_movementPatterns2.default);
+
+var Piece = function () {
+    function Piece(p) {
+        _classCallCheck(this, Piece);
+
+        this.id = p.object.uuid;
+        this.object = p.object;
+        this.player = p.player;
+        this.name = p.name;
+        this.position = p.position;
+
+        if (this.name in TYPES) {
+            if (this.player in _movementPatterns2.default[this.name]) {
+                this.movementPattern = _movementPatterns2.default[this.name][this.player];
+            } else {
+                this.movementPattern = _movementPatterns2.default[this.name];
+            }
+        }
+    }
+
+    _createClass(Piece, [{
+        key: "getPos",
+        value: function getPos() {
+            return {
+                row: this.position[0],
+                col: this.position[1]
+            };
+        }
+    }, {
+        key: "isAt",
+        value: function isAt() {
+            var args = Array.prototype.slice.call(arguments);
+            if (args[0] instanceof Array) {
+                return this.position[0] == args[0][0] && this.position[1] == args[0][1];
+            } else if (args[0] && args[0].row !== undefined && args[0].col !== undefined) {
+                return this.position[0] == args[0].row && this.position[1] == args[0].col;
+            } else {
+                return this.position[0] == args[0] && this.position[1] == args[1];
+            }
+        }
+    }, {
+        key: "highlight",
+        value: function highlight() {
+            var on = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+            if (on) {
+                var color = this.player == "WHITE" ? 0x004400 : 0x009900;
+                this.object.material.emissive.setHex(color);
+            } else {
+                this.object.material.emissive.setHex(0);
+            }
+        }
+    }]);
+
+    return Piece;
+}();
+
+exports.default = Piece;
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+var pawnWhite = exports.pawnWhite = function pawnWhite(pos, initPos) {
+	var firstMove = pos[0] == initPos[0] && pos[1] == initPos[1];
+	if (firstMove) {
+		return [[pos[0] + 1, pos[1]], [pos[0] + 2, pos[1]]];
+	} else {
+		return [[pos[0] + 1, pos[1]]];
+	}
+};
+
+var pawnBlack = exports.pawnBlack = function pawnBlack(pos, initPos) {
+	var firstMove = pos[0] == initPos[0] && pos[1] == initPos[1];
+	if (firstMove) {
+		return [[pos[0] - 1, pos[1]], [pos[0] - 2, pos[1]]];
+	} else {
+		return [[pos[0] - 1, pos[1]]];
+	}
+};
+
+var rook = exports.rook = function rook(pos) {
+	var possibleMoves = [];
+	for (var r = 0; r <= 7; r++) {
+		if (r != pos[0]) possibleMoves.push([r, pos[1]]);
+	}
+	for (var c = 0; c <= 7; c++) {
+		if (c != pos[1]) possibleMoves.push([pos[0], c]);
+	}
+	return possibleMoves;
+};
+
+var patterns = {
+	"PAWN": {
+		"WHITE": pawnWhite,
+		"BLACK": pawnBlack
+	},
+	"ROOK": {
+		rook: rook
+	}
+};
+
+exports.default = patterns;
 
 /***/ })
 /******/ ]);
