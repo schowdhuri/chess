@@ -83,7 +83,7 @@ const loadModels = (scene, scaleFactor) => {
         loader.load("models/pawn.json", (geo, mat) => {
             for(let i=1; i<=8; i++) {
                 const pawn = new Mesh(geo, whiteMat.clone());
-                pawn.position.set((i-1) * 2.005*scaleFactor, 0, 0);
+                pawn.position.set(-7 + (i-1) * 2.005*scaleFactor, 0, 5 * scaleFactor);
                 pawn.castShadow = true;
                 pawn.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(pawn);
@@ -96,7 +96,7 @@ const loadModels = (scene, scaleFactor) => {
             }
             for(let i=1; i<=8; i++) {
                 const pawn = new Mesh(geo, blackMat.clone());
-                pawn.position.set((i-1) * 2.005*scaleFactor, 0, -10 * scaleFactor);
+                pawn.position.set(-7 + (i-1) * 2.005*scaleFactor, 0, -5 * scaleFactor);
                 pawn.castShadow = true;
                 pawn.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(pawn);
@@ -112,7 +112,7 @@ const loadModels = (scene, scaleFactor) => {
         loader.load("models/rook.json", (geo, mat) => {
             for(let i=1; i<=2; i++) {
                 const rook = new Mesh(geo, whiteMat.clone());
-                rook.position.set((i-1) * 14*scaleFactor, 0, 0);
+                rook.position.set(-7 + (i-1) * 14*scaleFactor, 0, 7 * scaleFactor);
                 rook.castShadow = true;
                 rook.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(rook);
@@ -125,7 +125,7 @@ const loadModels = (scene, scaleFactor) => {
             }
             for(let i=1; i<=2; i++) {
                 const rook = new Mesh(geo, blackMat.clone());
-                rook.position.set((i-1) * 14*scaleFactor, 0, -14 * scaleFactor);
+                rook.position.set(-7 + (i-1) * 14*scaleFactor, 0, -7 * scaleFactor);
                 rook.castShadow = true;
                 rook.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(rook);
@@ -141,7 +141,7 @@ const loadModels = (scene, scaleFactor) => {
         loader.load("models/knight.json", (geo, mat) => {
             for(let i=1; i<=2; i++) {
                 const knight = new Mesh(geo, whiteMat.clone());
-                knight.position.set((i-1) * 10*scaleFactor, 0, 0);
+                knight.position.set(-5 + (i-1) * 10*scaleFactor, 0, 7 * scaleFactor);
                 knight.castShadow = true;
                 knight.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(knight);
@@ -154,7 +154,7 @@ const loadModels = (scene, scaleFactor) => {
             }
             for(let i=1; i<=2; i++) {
                 const knight = new Mesh(geo, blackMat.clone());
-                knight.position.set((i-1) * 10*scaleFactor, 0, -14 * scaleFactor);
+                knight.position.set(-5 + (i-1) * 10*scaleFactor, 0, -7 * scaleFactor);
                 knight.castShadow = true;
                 knight.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(knight);
@@ -170,7 +170,7 @@ const loadModels = (scene, scaleFactor) => {
         loader.load("models/bishop.json", (geo, mat) => {
             for(let i=1; i<=2; i++) {
                 const bishop = new Mesh(geo, whiteMat.clone());
-                bishop.position.set((i-1) * 6*scaleFactor, 0, 0);
+                bishop.position.set(-3 + (i-1) * 6*scaleFactor, 0, 7 * scaleFactor);
                 bishop.castShadow = true;
                 bishop.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(bishop);
@@ -183,7 +183,7 @@ const loadModels = (scene, scaleFactor) => {
             }
             for(let i=1; i<=2; i++) {
                 const bishop = new Mesh(geo, blackMat.clone());
-                bishop.position.set((i-1) * 6 * scaleFactor, 0, -14 * scaleFactor);
+                bishop.position.set(-3 + (i-1) * 6 * scaleFactor, 0, -7 * scaleFactor);
                 bishop.castShadow = true;
                 bishop.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(bishop);
@@ -198,7 +198,7 @@ const loadModels = (scene, scaleFactor) => {
 
         loader.load("models/queen.json", (geo, mat) => {
             const queen = new Mesh(geo, whiteMat.clone());
-            queen.position.set(0, 0, 0);
+            queen.position.set(-1, 0, 7 * scaleFactor);
             queen.castShadow = true;
             queen.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(queen);
@@ -210,7 +210,7 @@ const loadModels = (scene, scaleFactor) => {
             }));
             
             const queen2 = new Mesh(geo, blackMat.clone());
-            queen2.position.set(0, 0, -14 * scaleFactor);
+            queen2.position.set(-1, 0, -7 * scaleFactor);
             queen2.castShadow = true;
             queen2.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(queen2);
@@ -224,7 +224,7 @@ const loadModels = (scene, scaleFactor) => {
 
         loader.load("models/king.json", (geo, mat) => {
             const king = new Mesh(geo, whiteMat.clone());
-            king.position.set(0, 0, 0);
+            king.position.set(1, 0, 7 * scaleFactor);
             king.castShadow = true;
             king.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(king);
@@ -236,7 +236,7 @@ const loadModels = (scene, scaleFactor) => {
             }));
 
             const king2 = new Mesh(geo, blackMat.clone());
-            king2.position.set(0, 0, -14 * scaleFactor);
+            king2.position.set(1, 0, -7 * scaleFactor);
             king2.castShadow = true;
             king2.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(king2);

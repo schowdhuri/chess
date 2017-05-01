@@ -29,9 +29,19 @@ class Block {
             this.piece = null;
         }
     }
-    highlight(on=true) {
+    highlight(on=true, type=1) {
         if(on) {
-            const hcolor = this.color=="WHITE" ? 0x004400 : 0x009900;
+            let hcolor;
+            switch(type) {
+                case 2:
+                    hcolor = this.color=="WHITE" ? 0x440000 : 0x990000;
+                    break;
+
+                case 1:
+                default:
+                    hcolor = this.color=="WHITE" ? 0x004400 : 0x009900;
+                    break;
+            }
             this.object.material.emissive.setHex(hcolor);
         } else {
             this.object.material.emissive.setHex(0);

@@ -1,4 +1,4 @@
-import patterns from "./movementPatterns";
+import movementPatterns from "./movementPatterns";
 
 class Piece {
     constructor(p) {
@@ -7,8 +7,8 @@ class Piece {
         this.player = p.player;
         this.name = p.name;
         this.position = p.position;
-        this.initPosition = this.position;
-        this.movementPattern = patterns[this.name];
+        this.initPosition = [ ...this.position ];
+        this.captured = false;
         
     }
     getPos() {
@@ -16,6 +16,10 @@ class Piece {
             row: this.position[0],
             col: this.position[1]
         };
+    }
+    setPos(pos) {
+        this.position[0] = pos.row;
+        this.position[1] = pos.col;
     }
     isAt() {
         const args = Array.prototype.slice.call(arguments);
@@ -35,11 +39,8 @@ class Piece {
             this.object.material.emissive.setHex(0);
         }
     }
-    getPossibleMoves() {
-        if(this.movementPattern) {
-            return this.movementPattern(this.position, this.initPosition);
-        }
-        return [];
+    getPossibleMoves(board) {
+        return movementPatterns[this.name](this, board);
     }
 }
 

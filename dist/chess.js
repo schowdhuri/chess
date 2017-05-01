@@ -43837,6 +43837,10 @@ var setupInteraction = function setupInteraction(board, camera) {
     var mousePressed = false;
     var dragging = false;
 
+    var whiteTurn = true;
+    var moveMode = false;
+    var selected = null;
+
     document.addEventListener("mousedown", function (ev) {
         mousePressed = true;
         mouseDragTimer = setTimeout(function () {
@@ -43855,7 +43859,37 @@ var setupInteraction = function setupInteraction(board, camera) {
             var mousePos = new _three.Vector2();
             mousePos.x = ev.clientX / window.innerWidth * 2 - 1;
             mousePos.y = -(ev.clientY / window.innerHeight * 2 - 1);
-            var clickedPiece = board.findPieceUnderMouse(mousePos, camera);
+            if (!moveMode) {
+                // select mode
+                var piece = board.findPieceUnderMouse(mousePos, camera);
+                if (piece && (whiteTurn && piece.player == "WHITE" || !whiteTurn && piece.player == "BLACK")) {
+                    board.highlight(piece);
+                    // board.markPossibleMoves(piece);
+                    board.showPossibleMoves(piece);
+                    selected = {
+                        block: board.getBlock(piece.getPos()),
+                        piece: piece
+                    };
+                    moveMode = true;
+                    console.log("movemode ON");
+                    document.body.style.cursor = "default";
+                    window.selected = selected;
+                }
+            } else {
+                // select block
+                var block = board.findBlockUnderMouse(mousePos, camera);
+                if (block && board.isValidMove(selected, block)) {
+                    board.move(selected, block).then(function () {
+                        whiteTurn = !whiteTurn;
+                        moveMode = false;
+                        console.log("move complete; movemode OFF");
+                        selected.piece.highlight(false);
+                        board.unhighlightAllBlocks();
+                        selected = null;
+                    });
+                    document.body.style.cursor = "default";
+                }
+            }
         }
     }, false);
 
@@ -43864,15 +43898,40 @@ var setupInteraction = function setupInteraction(board, camera) {
         var mousePos = new _three.Vector2();
         mousePos.x = ev.clientX / window.innerWidth * 2 - 1;
         mousePos.y = -(ev.clientY / window.innerHeight * 2 - 1);
-        var piece = board.findPieceUnderMouse(mousePos, camera);
-        if (piece) {
-            document.body.style.cursor = "pointer";
-            board.highlight(piece);
-        } else if (document.body.style.cursor == "pointer") {
-            document.body.style.cursor = "default";
-            board.unhighlightAll();
+        if (!moveMode) {
+            // select piece mode
+            var piece = board.findPieceUnderMouse(mousePos, camera);
+            if (piece) {
+                document.body.style.cursor = "pointer";
+            } else if (document.body.style.cursor == "pointer") {
+                document.body.style.cursor = "default";
+                // board.unhighlightAll();
+                // board.unhighlightAllBlocks();
+            }
+        } else {
+            var block = board.findBlockUnderMouse(mousePos, camera);
+            if (block) {
+                if (board.isValidMove(selected, block)) {
+                    document.body.style.cursor = "pointer";
+                } else {
+                    document.body.style.cursor = "default";
+                }
+            } else {
+                document.body.style.cursor = "default";
+            }
         }
     }, 300));
+
+    document.addEventListener("keyup", function (ev) {
+        if (ev.keyCode === 27) {
+            board.unhighlightAll();
+            board.unhighlightAllBlocks();
+            moveMode = false;
+            selected = null;
+            document.body.style.cursor = "default";
+            console.log("move canceled; movemode OFF");
+        }
+    }, false);
 };
 
 exports.default = setupInteraction;
@@ -43974,7 +44033,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
         loader.load("models/pawn.json", function (geo, mat) {
             for (var i = 1; i <= 8; i++) {
                 var pawn = new _three.Mesh(geo, whiteMat.clone());
-                pawn.position.set((i - 1) * 2.005 * scaleFactor, 0, 0);
+                pawn.position.set(-7 + (i - 1) * 2.005 * scaleFactor, 0, 5 * scaleFactor);
                 pawn.castShadow = true;
                 pawn.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(pawn);
@@ -43987,7 +44046,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
             }
             for (var _i = 1; _i <= 8; _i++) {
                 var _pawn = new _three.Mesh(geo, blackMat.clone());
-                _pawn.position.set((_i - 1) * 2.005 * scaleFactor, 0, -10 * scaleFactor);
+                _pawn.position.set(-7 + (_i - 1) * 2.005 * scaleFactor, 0, -5 * scaleFactor);
                 _pawn.castShadow = true;
                 _pawn.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(_pawn);
@@ -44003,7 +44062,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
         loader.load("models/rook.json", function (geo, mat) {
             for (var i = 1; i <= 2; i++) {
                 var rook = new _three.Mesh(geo, whiteMat.clone());
-                rook.position.set((i - 1) * 14 * scaleFactor, 0, 0);
+                rook.position.set(-7 + (i - 1) * 14 * scaleFactor, 0, 7 * scaleFactor);
                 rook.castShadow = true;
                 rook.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(rook);
@@ -44016,7 +44075,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
             }
             for (var _i2 = 1; _i2 <= 2; _i2++) {
                 var _rook = new _three.Mesh(geo, blackMat.clone());
-                _rook.position.set((_i2 - 1) * 14 * scaleFactor, 0, -14 * scaleFactor);
+                _rook.position.set(-7 + (_i2 - 1) * 14 * scaleFactor, 0, -7 * scaleFactor);
                 _rook.castShadow = true;
                 _rook.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(_rook);
@@ -44032,7 +44091,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
         loader.load("models/knight.json", function (geo, mat) {
             for (var i = 1; i <= 2; i++) {
                 var knight = new _three.Mesh(geo, whiteMat.clone());
-                knight.position.set((i - 1) * 10 * scaleFactor, 0, 0);
+                knight.position.set(-5 + (i - 1) * 10 * scaleFactor, 0, 7 * scaleFactor);
                 knight.castShadow = true;
                 knight.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(knight);
@@ -44045,7 +44104,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
             }
             for (var _i3 = 1; _i3 <= 2; _i3++) {
                 var _knight = new _three.Mesh(geo, blackMat.clone());
-                _knight.position.set((_i3 - 1) * 10 * scaleFactor, 0, -14 * scaleFactor);
+                _knight.position.set(-5 + (_i3 - 1) * 10 * scaleFactor, 0, -7 * scaleFactor);
                 _knight.castShadow = true;
                 _knight.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(_knight);
@@ -44061,7 +44120,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
         loader.load("models/bishop.json", function (geo, mat) {
             for (var i = 1; i <= 2; i++) {
                 var bishop = new _three.Mesh(geo, whiteMat.clone());
-                bishop.position.set((i - 1) * 6 * scaleFactor, 0, 0);
+                bishop.position.set(-3 + (i - 1) * 6 * scaleFactor, 0, 7 * scaleFactor);
                 bishop.castShadow = true;
                 bishop.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(bishop);
@@ -44069,12 +44128,12 @@ var loadModels = function loadModels(scene, scaleFactor) {
                     player: "WHITE",
                     name: "BISHOP",
                     object: bishop,
-                    position: [0, 2 + (i - 1) * 4]
+                    position: [0, 2 + (i - 1) * 3]
                 }));
             }
             for (var _i4 = 1; _i4 <= 2; _i4++) {
                 var _bishop = new _three.Mesh(geo, blackMat.clone());
-                _bishop.position.set((_i4 - 1) * 6 * scaleFactor, 0, -14 * scaleFactor);
+                _bishop.position.set(-3 + (_i4 - 1) * 6 * scaleFactor, 0, -7 * scaleFactor);
                 _bishop.castShadow = true;
                 _bishop.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(_bishop);
@@ -44082,14 +44141,14 @@ var loadModels = function loadModels(scene, scaleFactor) {
                     player: "BLACK",
                     name: "BISHOP",
                     object: _bishop,
-                    position: [7, 2 + (_i4 - 1) * 4]
+                    position: [7, 2 + (_i4 - 1) * 3]
                 }));
             }
         });
 
         loader.load("models/queen.json", function (geo, mat) {
             var queen = new _three.Mesh(geo, whiteMat.clone());
-            queen.position.set(0, 0, 0);
+            queen.position.set(-1, 0, 7 * scaleFactor);
             queen.castShadow = true;
             queen.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(queen);
@@ -44101,7 +44160,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
             }));
 
             var queen2 = new _three.Mesh(geo, blackMat.clone());
-            queen2.position.set(0, 0, -14 * scaleFactor);
+            queen2.position.set(-1, 0, -7 * scaleFactor);
             queen2.castShadow = true;
             queen2.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(queen2);
@@ -44115,7 +44174,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
 
         loader.load("models/king.json", function (geo, mat) {
             var king = new _three.Mesh(geo, whiteMat.clone());
-            king.position.set(0, 0, 0);
+            king.position.set(1, 0, 7 * scaleFactor);
             king.castShadow = true;
             king.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(king);
@@ -44127,7 +44186,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
             }));
 
             var king2 = new _three.Mesh(geo, blackMat.clone());
-            king2.position.set(0, 0, -14 * scaleFactor);
+            king2.position.set(1, 0, -7 * scaleFactor);
             king2.castShadow = true;
             king2.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(king2);
@@ -45948,10 +46007,24 @@ var Board = function () {
                 return p.object;
             }));
             if (intersected.length) {
-                var pieceUnderMouse = this._pieces.find(function (p) {
-                    return p.id === intersected[0].object.uuid;
+                return this._pieces.find(function (p) {
+                    return p.id === intersected[0].object.uuid && !p.isCaptured;
                 });
-                return pieceUnderMouse;
+            }
+        }
+    }, {
+        key: "findBlockUnderMouse",
+        value: function findBlockUnderMouse(mousePos, camera) {
+            var raycaster = new _three.Raycaster();
+            raycaster.setFromCamera(mousePos, camera);
+            var intersected = raycaster.intersectObjects(this._block.map(function (b) {
+                return b.object;
+            }));
+            if (intersected.length) {
+                var blockUnderMouse = this._block.find(function (b) {
+                    return b.id === intersected[0].object.uuid;
+                });
+                return blockUnderMouse;
             }
         }
     }, {
@@ -45967,6 +46040,76 @@ var Board = function () {
         value: function getPiece(row, col) {
             return this._pieces.find(function (p) {
                 return p.isAt({ row: row, col: col });
+            });
+        }
+    }, {
+        key: "unhighlightAllBlocks",
+        value: function unhighlightAllBlocks() {
+            this._block.forEach(function (b) {
+                return b.highlight(false);
+            });
+        }
+    }, {
+        key: "markPossibleMoves",
+        value: function markPossibleMoves(piece) {
+            var _this = this;
+
+            var possibleMoves = piece.getPossibleMoves(this);
+            possibleMoves.filter(function (p) {
+                return !_this.getBlock(p).piece;
+            }).forEach(function (p) {
+                _this.getBlock(p).highlight();
+            });
+        }
+    }, {
+        key: "showPossibleMoves",
+        value: function showPossibleMoves(piece) {
+            var _this2 = this;
+
+            this.unhighlightAllBlocks();
+            var possibleMoves = piece.getPossibleMoves(this);
+            possibleMoves.forEach(function (p) {
+                _this2.getBlock(p).highlight(true, p[2] && p[2].capture ? 2 : 1);
+            });
+        }
+    }, {
+        key: "isValidMove",
+        value: function isValidMove(_ref, toBlock) {
+            var piece = _ref.piece,
+                block = _ref.block;
+
+            var possibleMoves = piece.getPossibleMoves(this);
+            var dest = toBlock.getPos();
+            return Boolean(possibleMoves.find(function (p) {
+                return p[0] == dest.row && p[1] == dest.col;
+            }));
+        }
+    }, {
+        key: "move",
+        value: function move(_ref2, toBlock) {
+            var piece = _ref2.piece,
+                block = _ref2.block;
+
+            var rowDelta = toBlock.getPos().row - block.getPos().row;
+            var colDelta = toBlock.getPos().col - block.getPos().col;
+
+            var movement = new _three.Vector3(colDelta * 2, 0, -rowDelta * 2);
+            return new Promise(function (fulfill, reject) {
+                piece.object.position.add(movement);
+                piece.setPos(toBlock.getPos());
+                block.setPiece(null);
+
+                if (toBlock.piece && toBlock.piece.player != piece.player) {
+                    // capture
+                    toBlock.piece.isCaptured = true;
+                    if (piece.player == "WHITE") {
+                        toBlock.piece.object.position.set(-Math.floor(Math.random() * 10) - 12, 0, Math.floor(Math.random() * 5) + 5);
+                    } else {
+                        toBlock.piece.object.position.set(-Math.floor(Math.random() * 10) - 12, 0, -(Math.floor(Math.random() * 5) + 5));
+                    }
+                }
+                toBlock.setPiece(piece);
+                fulfill();
             });
         }
     }]);
@@ -45991,17 +46134,18 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var BoardBlock = function () {
-    function BoardBlock(b) {
-        _classCallCheck(this, BoardBlock);
+var Block = function () {
+    function Block(b) {
+        _classCallCheck(this, Block);
 
+        this.id = b.object.uuid;
         this.object = b.object;
         this.color = b.color;
         this.position = b.position;
-        this.isOccupied = false;
+        this.piece = null;
     }
 
-    _createClass(BoardBlock, [{
+    _createClass(Block, [{
         key: "getPos",
         value: function getPos() {
             return {
@@ -46024,15 +46168,41 @@ var BoardBlock = function () {
     }, {
         key: "setPiece",
         value: function setPiece(piece) {
-            this.piece = piece;
-            this.isOccupied = true;
+            if (piece) {
+                this.piece = piece;
+            } else {
+                this.piece = null;
+            }
+        }
+    }, {
+        key: "highlight",
+        value: function highlight() {
+            var on = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+            var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+            if (on) {
+                var hcolor = void 0;
+                switch (type) {
+                    case 2:
+                        hcolor = this.color == "WHITE" ? 0x440000 : 0x990000;
+                        break;
+
+                    case 1:
+                    default:
+                        hcolor = this.color == "WHITE" ? 0x004400 : 0x009900;
+                        break;
+                }
+                this.object.material.emissive.setHex(hcolor);
+            } else {
+                this.object.material.emissive.setHex(0);
+            }
         }
     }]);
 
-    return BoardBlock;
+    return Block;
 }();
 
-exports.default = BoardBlock;
+exports.default = Block;
 
 /***/ }),
 /* 23 */
@@ -46053,9 +46223,9 @@ var _movementPatterns2 = _interopRequireDefault(_movementPatterns);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-var TYPES = Object.keys(_movementPatterns2.default);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Piece = function () {
     function Piece(p) {
@@ -46066,14 +46236,8 @@ var Piece = function () {
         this.player = p.player;
         this.name = p.name;
         this.position = p.position;
-
-        if (this.name in TYPES) {
-            if (this.player in _movementPatterns2.default[this.name]) {
-                this.movementPattern = _movementPatterns2.default[this.name][this.player];
-            } else {
-                this.movementPattern = _movementPatterns2.default[this.name];
-            }
-        }
+        this.initPosition = [].concat(_toConsumableArray(this.position));
+        this.captured = false;
     }
 
     _createClass(Piece, [{
@@ -46083,6 +46247,12 @@ var Piece = function () {
                 row: this.position[0],
                 col: this.position[1]
             };
+        }
+    }, {
+        key: "setPos",
+        value: function setPos(pos) {
+            this.position[0] = pos.row;
+            this.position[1] = pos.col;
         }
     }, {
         key: "isAt",
@@ -46108,6 +46278,11 @@ var Piece = function () {
                 this.object.material.emissive.setHex(0);
             }
         }
+    }, {
+        key: "getPossibleMoves",
+        value: function getPossibleMoves(board) {
+            return _movementPatterns2.default[this.name](this, board);
+        }
     }]);
 
     return Piece;
@@ -46123,45 +46298,257 @@ exports.default = Piece;
 
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+    value: true
 });
-var pawnWhite = exports.pawnWhite = function pawnWhite(pos, initPos) {
-	var firstMove = pos[0] == initPos[0] && pos[1] == initPos[1];
-	if (firstMove) {
-		return [[pos[0] + 1, pos[1]], [pos[0] + 2, pos[1]]];
-	} else {
-		return [[pos[0] + 1, pos[1]]];
-	}
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var pawn = function pawn(piece, board) {
+    var pos = piece.position;
+    var initPosition = piece.initPosition;
+    var firstMove = pos[0] == initPosition[0] && pos[1] == initPosition[1];
+    var possibleMoves = void 0;
+    var isWhite = initPosition[0] == 1;
+    if (isWhite) {
+        if (firstMove) {
+            possibleMoves = [[pos[0] + 1, pos[1]], [pos[0] + 2, pos[1]]];
+        } else {
+            possibleMoves = [[pos[0] + 1, pos[1]]];
+        }
+    } else {
+        // black
+        if (firstMove) {
+            possibleMoves = [[pos[0] - 1, pos[1]], [pos[0] - 2, pos[1]]];
+        } else {
+            possibleMoves = [[pos[0] - 1, pos[1]]];
+        }
+    }
+
+    var curPlayer = board.getBlock(pos).piece.player;
+    if (board.getBlock(possibleMoves[0]).piece) possibleMoves = [];
+    if (possibleMoves[1] && board.getBlock(possibleMoves[1]).piece) possibleMoves = possibleMoves.slice(0, 1);
+    // capture
+    if (isWhite) {
+        if (pos[0] < 7 && pos[1] > 0) {
+            // left diagonal
+            var diagonal = board.getBlock(pos[0] + 1, pos[1] - 1);
+            if (diagonal) {
+                var diagonalPiece = diagonal.piece;
+                if (diagonalPiece && diagonalPiece.player != curPlayer) possibleMoves.push([diagonalPiece.getPos().row, diagonalPiece.getPos().col, { capture: true }]);
+            }
+        }
+        if (pos[0] < 7 && pos[1] < 7) {
+            // right diagonal
+            var _diagonal = board.getBlock(pos[0] + 1, pos[1] + 1);
+            if (_diagonal) {
+                var _diagonalPiece = _diagonal.piece;
+                if (_diagonalPiece && _diagonalPiece.player != curPlayer) possibleMoves.push([_diagonalPiece.getPos().row, _diagonalPiece.getPos().col, { capture: true }]);
+            }
+        }
+    } else {
+        if (pos[0] > 0 && pos[1] > 0) {
+            // left diagonal
+            var _diagonal2 = board.getBlock(pos[0] - 1, pos[1] - 1);
+            if (_diagonal2) {
+                var _diagonalPiece2 = _diagonal2.piece;
+                if (_diagonalPiece2 && _diagonalPiece2.player != curPlayer) possibleMoves.push([_diagonalPiece2.getPos().row, _diagonalPiece2.getPos().col, { capture: true }]);
+            }
+        }
+        if (pos[0] > 0 && pos[1] < 7) {
+            // right diagonal
+            var _diagonal3 = board.getBlock(pos[0] - 1, pos[1] + 1);
+            if (_diagonal3) {
+                var _diagonalPiece3 = _diagonal3.piece;
+                if (_diagonalPiece3 && _diagonalPiece3.player != curPlayer) possibleMoves.push([_diagonalPiece3.getPos().row, _diagonalPiece3.getPos().col, { capture: true }]);
+            }
+        }
+    }
+    return possibleMoves;
 };
 
-var pawnBlack = exports.pawnBlack = function pawnBlack(pos, initPos) {
-	var firstMove = pos[0] == initPos[0] && pos[1] == initPos[1];
-	if (firstMove) {
-		return [[pos[0] - 1, pos[1]], [pos[0] - 2, pos[1]]];
-	} else {
-		return [[pos[0] - 1, pos[1]]];
-	}
+var rook = function rook(piece, board) {
+    var pos = piece.position;
+    var curPlayer = board.getBlock(pos).piece.player;
+    var r = pos[0] + 1;
+    var c = pos[1];
+    var pieceOnDestination = void 0;
+    var possibleMoves = [];
+    while (r <= 7) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r++, c]);
+        }
+    }
+    r = pos[0];
+    c = pos[1] + 1;
+    while (c <= 7) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r, c++]);
+        }
+    }
+    r = pos[0] - 1;
+    c = pos[1];
+    while (r >= 0) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r--, c]);
+        }
+    }
+    r = pos[0];
+    c = pos[1] - 1;
+    while (c >= 0) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r, c--]);
+        }
+    }
+    return possibleMoves;
 };
 
-var rook = exports.rook = function rook(pos) {
-	var possibleMoves = [];
-	for (var r = 0; r <= 7; r++) {
-		if (r != pos[0]) possibleMoves.push([r, pos[1]]);
-	}
-	for (var c = 0; c <= 7; c++) {
-		if (c != pos[1]) possibleMoves.push([pos[0], c]);
-	}
-	return possibleMoves;
+var knight = function knight(piece, board) {
+    var pos = piece.position;
+    var r = pos[0];
+    var c = pos[1];
+    var possibleMoves = [[r + 2, c + 1], [r + 1, c + 2], [r - 1, c + 2], [r - 2, c + 1], [r - 2, c - 1], [r - 1, c - 2], [r + 1, c - 2], [r + 2, c - 1]];
+    possibleMoves = possibleMoves.filter(function (p) {
+        return p[0] >= 0 && p[0] <= 7 && p[1] >= 0 && p[1] <= 7;
+    });
+
+    var curPlayer = board.getBlock(pos).piece.player;
+    var filteredMoves = [];
+    possibleMoves.forEach(function (p) {
+        var pieceOnDestination = board.getBlock(p).piece;
+        if (!pieceOnDestination) filteredMoves.push(p);else if (pieceOnDestination.player == curPlayer) return;else filteredMoves.push([].concat(_toConsumableArray(p), [{ capture: true }]));
+    });
+    return filteredMoves;
+};
+
+var bishop = function bishop(piece, board) {
+    var pos = piece.position;
+    var curPlayer = board.getBlock(pos).piece.player;
+    var r = pos[0] + 1;
+    var c = pos[1] + 1;
+    var pieceOnDestination = void 0;
+    var possibleMoves = [];
+    while (r <= 7 && c <= 7) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r++, c++]);
+        }
+    }
+    r = pos[0] - 1;
+    c = pos[1] + 1;
+    while (r >= 0 && c <= 7) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r--, c++]);
+        }
+    }
+    r = pos[0] - 1;
+    c = pos[1] - 1;
+    while (r >= 0 && c >= 0) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r--, c--]);
+        }
+    }
+    r = pos[0] + 1;
+    c = pos[1] - 1;
+    while (r <= 7 && c >= 0) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r++, c--]);
+        }
+    }
+    return possibleMoves;
+};
+
+var queen = function queen(piece, board) {
+    return [].concat(_toConsumableArray(rook(piece, board)), _toConsumableArray(bishop(piece, board)));
+};
+
+var king = function king(piece, board) {
+    var pos = piece.position;
+    var r = pos[0];
+    var c = pos[1];
+    var possibleMoves = [[r + 1, c], [r + 1, c + 1], [r, c + 1], [r - 1, c + 1], [r - 1, c], [r - 1, c - 1], [r, c - 1], [r + 1, c - 1]];
+    possibleMoves = possibleMoves.filter(function (p) {
+        return p[0] >= 0 && p[0] <= 7 && p[1] >= 0 && p[1] <= 7;
+    });
+
+    var curPlayer = board.getBlock(pos).piece.player;
+    var filteredMoves = [];
+    possibleMoves.forEach(function (p) {
+        var pieceOnDestination = board.getBlock(p).piece;
+        if (!pieceOnDestination) filteredMoves.push(p);else if (pieceOnDestination.player == curPlayer) return;else filteredMoves.push([].concat(_toConsumableArray(p), [{ capture: true }]));
+    });
+    return filteredMoves;
 };
 
 var patterns = {
-	"PAWN": {
-		"WHITE": pawnWhite,
-		"BLACK": pawnBlack
-	},
-	"ROOK": {
-		rook: rook
-	}
+    "PAWN": pawn,
+    "ROOK": rook,
+    "KNIGHT": knight,
+    "BISHOP": bishop,
+    "QUEEN": queen,
+    "KING": king
 };
 
 exports.default = patterns;

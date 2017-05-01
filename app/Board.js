@@ -1,4 +1,4 @@
-import { Raycaster } from "three";
+import { Raycaster, Vector3 } from "three";
 
 import Block from "./BoardBlock";
 import Piece from "./Piece";
@@ -33,8 +33,7 @@ class Board {
         raycaster.setFromCamera(mousePos, camera);
         const intersected = raycaster.intersectObjects(this._pieces.map(p => p.object));
         if(intersected.length) {
-            const pieceUnderMouse = this._pieces.find(p => p.id===intersected[0].object.uuid);
-            return pieceUnderMouse;
+            return this._pieces.find(p => p.id===intersected[0].object.uuid && !p.isCaptured);
         }
     }
     findBlockUnderMouse(mousePos, camera) {
@@ -56,23 +55,56 @@ class Board {
     unhighlightAllBlocks() {
         this._block.forEach(b => b.highlight(false));
     }
+    markPossibleMoves(piece) {
+        const possibleMoves = piece.getPossibleMoves(this);
+        possibleMoves
+            .filter(p => {
+                return !this.getBlock(p).piece;
+            })
+            .forEach(p => {
+                this.getBlock(p).highlight();
+            });
+    }
     showPossibleMoves(piece) {
         this.unhighlightAllBlocks();
-        const possibleMoves = piece.getPossibleMoves();
-        possibleMoves.forEach(pos => {
-            this.getBlock(pos).highlight();
+        const possibleMoves = piece.getPossibleMoves(this);
+        possibleMoves.forEach(p => {
+            this.getBlock(p).highlight(true, p[2] && p[2].capture ? 2 : 1);
         });
     }
+    isValidMove({ piece, block }, toBlock) {
+        const possibleMoves = piece.getPossibleMoves(this);
+        const dest = toBlock.getPos();
+        return Boolean(possibleMoves.find(p => p[0]==dest.row && p[1]==dest.col));
+    }
     move({ piece, block }, toBlock) {
-        const toX = toBlock.object.position.x;
-        const toY = toBlock.object.position.y;
-        const toZ = toBlock.object.position.z;
-        block.setPiece(null);
+        const rowDelta = toBlock.getPos().row - block.getPos().row;
+        const colDelta = toBlock.getPos().col - block.getPos().col;
+
+        const movement = new Vector3(colDelta * 2, 0, -rowDelta * 2);
         return new Promise((fulfill, reject) => {
-            piece.object.position.set(toX, toY, toZ);
+            piece.object.position.add(movement);
+            piece.setPos(toBlock.getPos());
+            block.setPiece(null);
+
+            if(toBlock.piece && toBlock.piece.player != piece.player) {
+                // capture
+                toBlock.piece.isCaptured = true;
+                if(piece.player=="WHITE") {
+                    toBlock.piece.object.position.set(
+                        -Math.floor(Math.random() * 10) - 12,
+                        0,
+                        Math.floor(Math.random() * 5) + 5
+                    );
+                } else {
+                    toBlock.piece.object.position.set(
+                        -Math.floor(Math.random() * 10) - 12,
+                        0,
+                        -(Math.floor(Math.random() * 5) + 5)
+                    );
+                }
+            }
             toBlock.setPiece(piece);
-            // block.getPos().row
-            // block.getPos().col
             fulfill();
         });
     }

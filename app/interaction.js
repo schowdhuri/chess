@@ -31,8 +31,9 @@ const setupInteraction = (board, camera) => {
             if(!moveMode) {
                 // select mode
                 const piece = board.findPieceUnderMouse(mousePos, camera);
-                if(whiteTurn && piece.player=="WHITE" || !whiteTurn && piece.player=="BLACK") {
+                if(piece && (whiteTurn && piece.player=="WHITE" || !whiteTurn && piece.player=="BLACK")) {
                     board.highlight(piece);
+                    // board.markPossibleMoves(piece);
                     board.showPossibleMoves(piece);
                     selected = {
                         block: board.getBlock(piece.getPos()),
@@ -41,21 +42,22 @@ const setupInteraction = (board, camera) => {
                     moveMode = true;
                     console.log("movemode ON")
                     document.body.style.cursor = "default";
+                    window.selected = selected;
                 }
             } else {
                 // select block
                 const block = board.findBlockUnderMouse(mousePos, camera);
-                // TODO validity checks
-                console.log("MOVING ", selected, " to ", block);
-                board.move(selected, block).then(() => {
-                    selected = null;
-                    whiteTurn = !whiteTurn;
-                    moveMode = false;
-                    console.log("movemode OFF")
-                    board.unhighlightAllBlocks();
-                });
-                document.body.style.cursor = "default";
-
+                if(block && board.isValidMove(selected, block)) {
+                    board.move(selected, block).then(() => {
+                        whiteTurn = !whiteTurn;
+                        moveMode = false;
+                        console.log("move complete; movemode OFF")
+                        selected.piece.highlight(false);
+                        board.unhighlightAllBlocks();
+                        selected = null;
+                    });
+                    document.body.style.cursor = "default";
+                }
             }
         }
     }, false);
@@ -79,12 +81,27 @@ const setupInteraction = (board, camera) => {
         } else {
             const block = board.findBlockUnderMouse(mousePos, camera);
             if(block) {
-                document.body.style.cursor = "pointer";
-            } else if(document.body.style.cursor=="pointer") {
+                if(board.isValidMove(selected, block)) {
+                    document.body.style.cursor = "pointer";
+                } else {
+                    document.body.style.cursor = "default";
+                }
+            } else {
                 document.body.style.cursor = "default";
             }
         }
     }, 300));
+
+    document.addEventListener("keyup", ev => {
+        if(ev.keyCode===27) {
+            board.unhighlightAll();
+            board.unhighlightAllBlocks();
+            moveMode = false;
+            selected = null;
+            document.body.style.cursor = "default";
+            console.log("move canceled; movemode OFF");
+        }
+    }, false);
 };
 
 export default setupInteraction;
