@@ -29,7 +29,7 @@ const OrbitControls = OrbitControlsFactory({
     EventDispatcher 
 });
 
-const setup = () => {
+const setup = (container) => {
     const scaleFactor = window.innerWidth < window.innerHeight
         ? window.innerWidth / 1330
         : 1;
@@ -49,9 +49,7 @@ const setup = () => {
     renderer.setSize(window.innerWidth, window.innerHeight-5);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = PCFSoftShadowMap;
-    document.getElementById("container").appendChild(renderer.domElement);
-
-
+    container.appendChild(renderer.domElement);
 
     const ambientLight = new AmbientLight(0x808081, 1.5);
     scene.add(ambientLight);

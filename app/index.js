@@ -7,7 +7,7 @@ const {
     scaleFactor,
     renderer,
     camera
-} = setup();
+} = setup(document.getElementById("container"));
 
 const { pieces } = loadModels(scene, scaleFactor);
 
@@ -16,5 +16,7 @@ const render = () => {
     renderer.render(scene, camera);
 };
 render();
+
+window.pieces = pieces;
 
 setupEvents(pieces, camera);

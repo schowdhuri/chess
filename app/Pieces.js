@@ -8,7 +8,8 @@ class Pieces {
         this._pieces.push({
             object: p.object,
             player: p.player,
-            name: p.name
+            name: p.name,
+            position: p.position
         });
     }
     unhighlightAll() {
@@ -31,7 +32,10 @@ class Pieces {
             const pieceUnderMouse = this._pieces.find(p => p.object.uuid===intersected[0].object.uuid);
             return pieceUnderMouse;
         }
-    };
+    }
+    at(row, col) {
+        return this._pieces.find(p => p.position[0]==row && p.position[1]==col);
+    }
 }
 
 export default Pieces;

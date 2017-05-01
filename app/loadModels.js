@@ -75,6 +75,9 @@ const loadModels = (scene, scaleFactor) => {
         });
 
         loader.load("models/pawn.json", (geo, mat) => {
+            const movementPattern = () => {
+
+            };
             for(let i=1; i<=8; i++) {
                 const pawn = new Mesh(geo, whiteMat.clone());
                 pawn.position.set((i-1) * 2.005*scaleFactor, 0, 0);
@@ -84,7 +87,8 @@ const loadModels = (scene, scaleFactor) => {
                 pieces.add({
                     player: "WHITE",
                     name: "PAWN",
-                    object: pawn
+                    object: pawn,
+                    position: [1, i-1]
                 });
             }
             for(let i=1; i<=8; i++) {
@@ -96,7 +100,8 @@ const loadModels = (scene, scaleFactor) => {
                 pieces.add({
                     player: "BLACK",
                     name: "PAWN",
-                    object: pawn
+                    object: pawn,
+                    position: [6, i]
                 });
             }
         });
@@ -111,7 +116,8 @@ const loadModels = (scene, scaleFactor) => {
                 pieces.add({
                     player: "WHITE",
                     name: "ROOK",
-                    object: rook
+                    object: rook,
+                    position: [0, (i-1)*7]
                 });
             }
             for(let i=1; i<=2; i++) {
@@ -123,7 +129,8 @@ const loadModels = (scene, scaleFactor) => {
                 pieces.add({
                     player: "BLACK",
                     name: "ROOK",
-                    object: rook
+                    object: rook,
+                    position: [7, (i-1)*7]
                 });
             }
         });
@@ -138,7 +145,8 @@ const loadModels = (scene, scaleFactor) => {
                 pieces.add({
                     player: "WHITE",
                     name: "KNIGHT",
-                    object: knight
+                    object: knight,
+                    position: [0, 1 + (i-1)*5]
                 });
             }
             for(let i=1; i<=2; i++) {
@@ -150,7 +158,8 @@ const loadModels = (scene, scaleFactor) => {
                 pieces.add({
                     player: "BLACK",
                     name: "KNIGHT",
-                    object: knight
+                    object: knight,
+                    position: [7, 1 + (i-1)*5]
                 });
             }
         });
@@ -165,7 +174,8 @@ const loadModels = (scene, scaleFactor) => {
                 pieces.add({
                     player: "WHITE",
                     name: "BISHOP",
-                    object: bishop
+                    object: bishop,
+                    position: [0, 2 + (i-1)*4]
                 });
             }
             for(let i=1; i<=2; i++) {
@@ -177,7 +187,8 @@ const loadModels = (scene, scaleFactor) => {
                 pieces.add({
                     player: "BLACK",
                     name: "BISHOP",
-                    object: bishop
+                    object: bishop,
+                    position: [7, 2 + (i-1)*4]
                 });
             }
         });
@@ -191,7 +202,8 @@ const loadModels = (scene, scaleFactor) => {
             pieces.add({
                 player: "WHITE",
                 name: "QUEEN",
-                object: queen
+                object: queen,
+                position: [0, 3]
             });
             
             const queen2 = new Mesh(geo, blackMat.clone());
@@ -202,7 +214,8 @@ const loadModels = (scene, scaleFactor) => {
             pieces.add({
                 player: "BLACK",
                 name: "QUEEN",
-                object: queen2
+                object: queen2,
+                position: [7, 3]
             });
         });
 
@@ -215,7 +228,8 @@ const loadModels = (scene, scaleFactor) => {
             pieces.add({
                 player: "WHITE",
                 name: "KING",
-                object: king
+                object: king,
+                position: [0, 4]
             });
 
             const king2 = new Mesh(geo, blackMat.clone());
@@ -226,7 +240,8 @@ const loadModels = (scene, scaleFactor) => {
             pieces.add({
                 player: "BLACK",
                 name: "KING",
-                object: king2
+                object: king2,
+                position: [7, 4]
             });
         });
         
