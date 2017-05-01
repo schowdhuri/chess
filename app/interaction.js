@@ -38,9 +38,11 @@ const setupInteraction = (board, camera) => {
         if(piece) {
             document.body.style.cursor = "pointer";
             board.highlight(piece);
+            board.showPossibleMoves(piece);
         } else if(document.body.style.cursor=="pointer") {
             document.body.style.cursor = "default";
             board.unhighlightAll();
+            board.unhighlightAllBlocks();
         }
     }, 300));
 };
