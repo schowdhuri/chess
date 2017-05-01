@@ -178,7 +178,7 @@ const loadModels = (scene, scaleFactor) => {
                     player: "WHITE",
                     name: "BISHOP",
                     object: bishop,
-                    position: [0, 2 + (i-1)*4]
+                    position: [0, 2 + (i-1)*3]
                 }));
             }
             for(let i=1; i<=2; i++) {
@@ -191,7 +191,7 @@ const loadModels = (scene, scaleFactor) => {
                     player: "BLACK",
                     name: "BISHOP",
                     object: bishop,
-                    position: [7, 2 + (i-1)*4]
+                    position: [7, 2 + (i-1)*3]
                 }));
             }
         });

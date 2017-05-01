@@ -1,7 +1,5 @@
 import patterns from "./movementPatterns";
 
-const TYPES = Object.keys(patterns);
-
 class Piece {
     constructor(p) {
         this.id = p.object.uuid;
@@ -10,17 +8,8 @@ class Piece {
         this.name = p.name;
         this.position = p.position;
         this.initPosition = this.position;
-
-        const type = TYPES.find(t => t==this.name);
-        if(type) {
-            if(this.player in patterns[this.name]) {
-                this.movementPattern = patterns[this.name][this.player];
-            } else {
-                this.movementPattern = patterns[this.name];
-            }
-        } else {
-            console.log(this.name + " movement unknown")
-        }
+        this.movementPattern = patterns[this.name];
+        
     }
     getPos() {
         return {
