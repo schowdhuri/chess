@@ -1,4 +1,4 @@
-const TOTAL_TIME = 1000; // ms
+const TOTAL_TIME = 600; // ms
 
 const findCoeftA = (x1, y1, x2, y2, x3, y3) =>
     (((y2-y3)/(x2-x3)) - ((y1-y2)/(x1-x2))) / (x3-x1);
@@ -32,7 +32,9 @@ const animatePiece = (piece, dest) => {
     const deltaX = x3-x1;
     const deltaZ = z3-z1;
     const x2 = x1 + deltaX/2;
-    const y2 = 4; // for now
+    const y2 = Math.abs(deltaX) > Math.abs(deltaZ)
+                ? (Math.abs(deltaX) > 4 ? 4 : Math.abs(deltaX))
+                : (Math.abs(deltaZ) > 4 ? 4 : Math.abs(deltaZ));
     const z2 = z1 + deltaZ/2;
 
     const a1 = findCoeftA(x1, y1, x2, y2, x3, y3);
@@ -60,9 +62,9 @@ const animatePiece = (piece, dest) => {
             // console.log(x1+dx, y, z1 + dz);
             y = Math.abs(y);
             piece.object.position.set(x1 + dx, y, z1 + dz);
-            if(dt < TOTAL_TIME)
+            if(dt < TOTAL_TIME) {
                 requestAnimationFrame(incrementalAnim);
-            else {
+            } else {
                 piece.object.position.set(...dest);
                 fulfill();
             }

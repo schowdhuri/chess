@@ -44168,7 +44168,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
 
     var matsLoaded = Promise.all([blackBoardMatLoaded, whiteBoardMatLoaded, whiteMatLoaded, blackMatLoaded]);
 
-    var board = new _Board2.default();
+    var board = new _Board2.default(scaleFactor);
     window.board = board;
 
     matsLoaded.then(function (materials) {
@@ -44204,7 +44204,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
         loader.load("models/pawn.json", function (geo, mat) {
             for (var i = 1; i <= 8; i++) {
                 var pawn = new _three.Mesh(geo, whiteMat.clone());
-                pawn.position.set(-7 + (i - 1) * 2.005 * scaleFactor, 0, 5 * scaleFactor);
+                pawn.position.set(-7 * scaleFactor + (i - 1) * 2.005 * scaleFactor, 0, 5 * scaleFactor);
                 pawn.castShadow = true;
                 pawn.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(pawn);
@@ -44217,7 +44217,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
             }
             for (var _i = 1; _i <= 8; _i++) {
                 var _pawn = new _three.Mesh(geo, blackMat.clone());
-                _pawn.position.set(-7 + (_i - 1) * 2.005 * scaleFactor, 0, -5 * scaleFactor);
+                _pawn.position.set(-7 * scaleFactor + (_i - 1) * 2.005 * scaleFactor, 0, -5 * scaleFactor);
                 _pawn.castShadow = true;
                 _pawn.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(_pawn);
@@ -44233,7 +44233,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
         loader.load("models/rook.json", function (geo, mat) {
             for (var i = 1; i <= 2; i++) {
                 var rook = new _three.Mesh(geo, whiteMat.clone());
-                rook.position.set(-7 + (i - 1) * 14 * scaleFactor, 0, 7 * scaleFactor);
+                rook.position.set(-7 * scaleFactor + (i - 1) * 14 * scaleFactor, 0, 7 * scaleFactor);
                 rook.castShadow = true;
                 rook.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(rook);
@@ -44246,7 +44246,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
             }
             for (var _i2 = 1; _i2 <= 2; _i2++) {
                 var _rook = new _three.Mesh(geo, blackMat.clone());
-                _rook.position.set(-7 + (_i2 - 1) * 14 * scaleFactor, 0, -7 * scaleFactor);
+                _rook.position.set(-7 * scaleFactor + (_i2 - 1) * 14 * scaleFactor, 0, -7 * scaleFactor);
                 _rook.castShadow = true;
                 _rook.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(_rook);
@@ -44262,7 +44262,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
         loader.load("models/knight.json", function (geo, mat) {
             for (var i = 1; i <= 2; i++) {
                 var knight = new _three.Mesh(geo, whiteMat.clone());
-                knight.position.set(-5 + (i - 1) * 10 * scaleFactor, 0, 7 * scaleFactor);
+                knight.position.set(-5 * scaleFactor + (i - 1) * 10 * scaleFactor, 0, 7 * scaleFactor);
                 knight.castShadow = true;
                 knight.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(knight);
@@ -44275,7 +44275,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
             }
             for (var _i3 = 1; _i3 <= 2; _i3++) {
                 var _knight = new _three.Mesh(geo, blackMat.clone());
-                _knight.position.set(-5 + (_i3 - 1) * 10 * scaleFactor, 0, -7 * scaleFactor);
+                _knight.position.set(-5 * scaleFactor + (_i3 - 1) * 10 * scaleFactor, 0, -7 * scaleFactor);
                 _knight.castShadow = true;
                 _knight.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(_knight);
@@ -44291,7 +44291,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
         loader.load("models/bishop.json", function (geo, mat) {
             for (var i = 1; i <= 2; i++) {
                 var bishop = new _three.Mesh(geo, whiteMat.clone());
-                bishop.position.set(-3 + (i - 1) * 6 * scaleFactor, 0, 7 * scaleFactor);
+                bishop.position.set(-3 * scaleFactor + (i - 1) * 6 * scaleFactor, 0, 7 * scaleFactor);
                 bishop.castShadow = true;
                 bishop.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(bishop);
@@ -44304,7 +44304,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
             }
             for (var _i4 = 1; _i4 <= 2; _i4++) {
                 var _bishop = new _three.Mesh(geo, blackMat.clone());
-                _bishop.position.set(-3 + (_i4 - 1) * 6 * scaleFactor, 0, -7 * scaleFactor);
+                _bishop.position.set(-3 * scaleFactor + (_i4 - 1) * 6 * scaleFactor, 0, -7 * scaleFactor);
                 _bishop.castShadow = true;
                 _bishop.scale.set(scaleFactor, scaleFactor, scaleFactor);
                 scene.add(_bishop);
@@ -44319,7 +44319,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
 
         loader.load("models/queen.json", function (geo, mat) {
             var queen = new _three.Mesh(geo, whiteMat.clone());
-            queen.position.set(-1, 0, 7 * scaleFactor);
+            queen.position.set(-1 * scaleFactor, 0, 7 * scaleFactor);
             queen.castShadow = true;
             queen.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(queen);
@@ -44331,7 +44331,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
             }));
 
             var queen2 = new _three.Mesh(geo, blackMat.clone());
-            queen2.position.set(-1, 0, -7 * scaleFactor);
+            queen2.position.set(-1 * scaleFactor, 0, -7 * scaleFactor);
             queen2.castShadow = true;
             queen2.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(queen2);
@@ -44345,7 +44345,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
 
         loader.load("models/king.json", function (geo, mat) {
             var king = new _three.Mesh(geo, whiteMat.clone());
-            king.position.set(1, 0, 7 * scaleFactor);
+            king.position.set(1 * scaleFactor, 0, 7 * scaleFactor);
             king.castShadow = true;
             king.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(king);
@@ -44357,7 +44357,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
             }));
 
             var king2 = new _three.Mesh(geo, blackMat.clone());
-            king2.position.set(1, 0, -7 * scaleFactor);
+            king2.position.set(1 * scaleFactor, 0, -7 * scaleFactor);
             king2.castShadow = true;
             king2.scale.set(scaleFactor, scaleFactor, scaleFactor);
             scene.add(king2);
@@ -44479,11 +44479,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Board = function () {
-    function Board() {
+    function Board(scaleFactor) {
         _classCallCheck(this, Board);
 
         this._block = [];
         this._pieces = [];
+        this.scaleFactor = scaleFactor;
     }
 
     _createClass(Board, [{
@@ -44600,38 +44601,6 @@ var Board = function () {
                 return p[0] == dest.row && p[1] == dest.col;
             }));
         }
-        // move({ piece, block }, toBlock) {
-        //     const rowDelta = toBlock.getPos().row - block.getPos().row;
-        //     const colDelta = toBlock.getPos().col - block.getPos().col;
-
-        //     const movement = new Vector3(colDelta * 2, 0, -rowDelta * 2);
-        //     return new Promise((fulfill, reject) => {
-        //         piece.object.position.add(movement);
-        //         piece.setPos(toBlock.getPos());
-        //         block.setPiece(null);
-
-        //         if(toBlock.piece && toBlock.piece.player != piece.player) {
-        //             // capture
-        //             toBlock.piece.isCaptured = true;
-        //             if(piece.player=="WHITE") {
-        //                 toBlock.piece.object.position.set(
-        //                     -Math.floor(Math.random() * 10) - 12,
-        //                     0,
-        //                     Math.floor(Math.random() * 5) + 5
-        //                 );
-        //             } else {
-        //                 toBlock.piece.object.position.set(
-        //                     -Math.floor(Math.random() * 10) - 12,
-        //                     0,
-        //                     -(Math.floor(Math.random() * 5) + 5)
-        //                 );
-        //             }
-        //         }
-        //         toBlock.setPiece(piece);
-        //         fulfill();
-        //     });
-        // }
-
     }, {
         key: "move",
         value: function move(_ref2, toBlock) {
@@ -44641,7 +44610,7 @@ var Board = function () {
             var rowDelta = toBlock.getPos().row - block.getPos().row;
             var colDelta = toBlock.getPos().col - block.getPos().col;
 
-            var dest = [piece.object.position.x + colDelta * 2, piece.object.position.y, piece.object.position.z - rowDelta * 2];
+            var dest = [piece.object.position.x + colDelta * 2 * this.scaleFactor, piece.object.position.y, piece.object.position.z - rowDelta * 2 * this.scaleFactor];
             return new Promise(function (fulfill, reject) {
                 console.log("MOVING: ", piece.object.position, " TO: ", dest);
                 (0, _animatePiece2.default)(piece, dest).then(function () {
@@ -44682,7 +44651,7 @@ Object.defineProperty(exports, "__esModule", {
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-var TOTAL_TIME = 1000; // ms
+var TOTAL_TIME = 600; // ms
 
 var findCoeftA = function findCoeftA(x1, y1, x2, y2, x3, y3) {
     return ((y2 - y3) / (x2 - x3) - (y1 - y2) / (x1 - x2)) / (x3 - x1);
@@ -44717,7 +44686,7 @@ var animatePiece = function animatePiece(piece, dest) {
     var deltaX = x3 - x1;
     var deltaZ = z3 - z1;
     var x2 = x1 + deltaX / 2;
-    var y2 = 4; // for now
+    var y2 = Math.abs(deltaX) > Math.abs(deltaZ) ? Math.abs(deltaX) > 4 ? 4 : Math.abs(deltaX) : Math.abs(deltaZ) > 4 ? 4 : Math.abs(deltaZ);
     var z2 = z1 + deltaZ / 2;
 
     var a1 = findCoeftA(x1, y1, x2, y2, x3, y3);
@@ -44745,7 +44714,9 @@ var animatePiece = function animatePiece(piece, dest) {
             // console.log(x1+dx, y, z1 + dz);
             y = Math.abs(y);
             piece.object.position.set(x1 + dx, y, z1 + dz);
-            if (dt < TOTAL_TIME) requestAnimationFrame(incrementalAnim);else {
+            if (dt < TOTAL_TIME) {
+                requestAnimationFrame(incrementalAnim);
+            } else {
                 var _piece$object$positio;
 
                 (_piece$object$positio = piece.object.position).set.apply(_piece$object$positio, _toConsumableArray(dest));

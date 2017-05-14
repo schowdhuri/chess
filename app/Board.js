@@ -5,9 +5,10 @@ import Piece from "./Piece";
 import animate from "./animatePiece";
 
 class Board {
-    constructor() {
+    constructor(scaleFactor) {
         this._block = [];
         this._pieces = [];
+        this.scaleFactor = scaleFactor;
     }
     add(x) {
         if(x instanceof Block) {
@@ -78,45 +79,14 @@ class Board {
         const dest = toBlock.getPos();
         return Boolean(possibleMoves.find(p => p[0]==dest.row && p[1]==dest.col));
     }
-    // move({ piece, block }, toBlock) {
-    //     const rowDelta = toBlock.getPos().row - block.getPos().row;
-    //     const colDelta = toBlock.getPos().col - block.getPos().col;
-
-    //     const movement = new Vector3(colDelta * 2, 0, -rowDelta * 2);
-    //     return new Promise((fulfill, reject) => {
-    //         piece.object.position.add(movement);
-    //         piece.setPos(toBlock.getPos());
-    //         block.setPiece(null);
-
-    //         if(toBlock.piece && toBlock.piece.player != piece.player) {
-    //             // capture
-    //             toBlock.piece.isCaptured = true;
-    //             if(piece.player=="WHITE") {
-    //                 toBlock.piece.object.position.set(
-    //                     -Math.floor(Math.random() * 10) - 12,
-    //                     0,
-    //                     Math.floor(Math.random() * 5) + 5
-    //                 );
-    //             } else {
-    //                 toBlock.piece.object.position.set(
-    //                     -Math.floor(Math.random() * 10) - 12,
-    //                     0,
-    //                     -(Math.floor(Math.random() * 5) + 5)
-    //                 );
-    //             }
-    //         }
-    //         toBlock.setPiece(piece);
-    //         fulfill();
-    //     });
-    // }
     move({ piece, block }, toBlock) {
         const rowDelta = toBlock.getPos().row - block.getPos().row;
         const colDelta = toBlock.getPos().col - block.getPos().col;
         
         const dest = [
-            piece.object.position.x + colDelta * 2,
+            piece.object.position.x + colDelta * 2 * this.scaleFactor,
             piece.object.position.y,
-            piece.object.position.z - rowDelta * 2
+            piece.object.position.z - rowDelta * 2 * this.scaleFactor
         ];
         return new Promise((fulfill, reject) => {
             console.log("MOVING: ", piece.object.position, " TO: ", dest);
