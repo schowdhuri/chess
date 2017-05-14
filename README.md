@@ -17,13 +17,14 @@ Bloated, unoptimized 3D models!
 - [x] Basic mouse interaction
 - [x] Break board down into blocks
 - [x] Move to npm + webpack build
-- [ ] Move validation
-- [ ] Moving and capturing
+- [x] Move validation
+- [x] Moving and capturing
+- [x] Improve animation
 - [ ] Add preloader
 - [ ] Optimize geometry
 - [ ] Better materials
-- [ ] Improve lights
-- [ ] 2-player gameplay
+- [ ] Human vs machine
+- [ ] Human vs human gameplay
 
 ## License
 
