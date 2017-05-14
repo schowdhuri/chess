@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -43790,7 +43790,178 @@ module.exports = isObject;
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var root = __webpack_require__(3);
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Block = function () {
+    function Block(b) {
+        _classCallCheck(this, Block);
+
+        this.id = b.object.uuid;
+        this.object = b.object;
+        this.color = b.color;
+        this.position = b.position;
+        this.piece = null;
+    }
+
+    _createClass(Block, [{
+        key: "getPos",
+        value: function getPos() {
+            return {
+                row: this.position[0],
+                col: this.position[1]
+            };
+        }
+    }, {
+        key: "isAt",
+        value: function isAt() {
+            var args = Array.prototype.slice.call(arguments);
+            if (args[0] instanceof Array) {
+                return this.position[0] == args[0][0] && this.position[1] == args[0][1];
+            } else if (args[0] && args[0].row !== undefined && args[0].col !== undefined) {
+                return this.position[0] == args[0].row && this.position[1] == args[0].col;
+            } else {
+                return this.position[0] == args[0] && this.position[1] == args[1];
+            }
+        }
+    }, {
+        key: "setPiece",
+        value: function setPiece(piece) {
+            if (piece) {
+                this.piece = piece;
+            } else {
+                this.piece = null;
+            }
+        }
+    }, {
+        key: "highlight",
+        value: function highlight() {
+            var on = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+            var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+            if (on) {
+                var hcolor = void 0;
+                switch (type) {
+                    case 2:
+                        hcolor = this.color == "WHITE" ? 0x440000 : 0x990000;
+                        break;
+
+                    case 1:
+                    default:
+                        hcolor = this.color == "WHITE" ? 0x004400 : 0x009900;
+                        break;
+                }
+                this.object.material.emissive.setHex(hcolor);
+            } else {
+                this.object.material.emissive.setHex(0);
+            }
+        }
+    }]);
+
+    return Block;
+}();
+
+exports.default = Block;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _movementPatterns = __webpack_require__(12);
+
+var _movementPatterns2 = _interopRequireDefault(_movementPatterns);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Piece = function () {
+    function Piece(p) {
+        _classCallCheck(this, Piece);
+
+        this.id = p.object.uuid;
+        this.object = p.object;
+        this.player = p.player;
+        this.name = p.name;
+        this.position = p.position;
+        this.initPosition = [].concat(_toConsumableArray(this.position));
+        this.captured = false;
+    }
+
+    _createClass(Piece, [{
+        key: "getPos",
+        value: function getPos() {
+            return {
+                row: this.position[0],
+                col: this.position[1]
+            };
+        }
+    }, {
+        key: "setPos",
+        value: function setPos(pos) {
+            this.position[0] = pos.row;
+            this.position[1] = pos.col;
+        }
+    }, {
+        key: "isAt",
+        value: function isAt() {
+            var args = Array.prototype.slice.call(arguments);
+            if (args[0] instanceof Array) {
+                return this.position[0] == args[0][0] && this.position[1] == args[0][1];
+            } else if (args[0] && args[0].row !== undefined && args[0].col !== undefined) {
+                return this.position[0] == args[0].row && this.position[1] == args[0].col;
+            } else {
+                return this.position[0] == args[0] && this.position[1] == args[1];
+            }
+        }
+    }, {
+        key: "highlight",
+        value: function highlight() {
+            var on = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+            if (on) {
+                var color = this.player == "WHITE" ? 0x004400 : 0x009900;
+                this.object.material.emissive.setHex(color);
+            } else {
+                this.object.material.emissive.setHex(0);
+            }
+        }
+    }, {
+        key: "getPossibleMoves",
+        value: function getPossibleMoves(board) {
+            return _movementPatterns2.default[this.name](this, board);
+        }
+    }]);
+
+    return Piece;
+}();
+
+exports.default = Piece;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var root = __webpack_require__(5);
 
 /** Built-in value references. */
 var Symbol = root.Symbol;
@@ -43799,10 +43970,10 @@ module.exports = Symbol;
 
 
 /***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var freeGlobal = __webpack_require__(10);
+var freeGlobal = __webpack_require__(14);
 
 /** Detect free variable `self`. */
 var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
@@ -43814,7 +43985,7 @@ module.exports = root;
 
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43826,7 +43997,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _three = __webpack_require__(0);
 
-var _throttle = __webpack_require__(17);
+var _throttle = __webpack_require__(21);
 
 var _throttle2 = _interopRequireDefault(_throttle);
 
@@ -43937,7 +44108,7 @@ var setupInteraction = function setupInteraction(board, camera) {
 exports.default = setupInteraction;
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -43949,15 +44120,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _three = __webpack_require__(0);
 
-var _Board = __webpack_require__(21);
+var _Board = __webpack_require__(9);
 
 var _Board2 = _interopRequireDefault(_Board);
 
-var _BoardBlock = __webpack_require__(22);
+var _BoardBlock = __webpack_require__(2);
 
 var _BoardBlock2 = _interopRequireDefault(_BoardBlock);
 
-var _Piece = __webpack_require__(23);
+var _Piece = __webpack_require__(3);
 
 var _Piece2 = _interopRequireDefault(_Piece);
 
@@ -44206,7 +44377,7 @@ var loadModels = function loadModels(scene, scaleFactor) {
 exports.default = loadModels;
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44218,7 +44389,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _three = __webpack_require__(0);
 
-var _threeOrbitControls = __webpack_require__(19);
+var _threeOrbitControls = __webpack_require__(23);
 
 var _threeOrbitControls2 = _interopRequireDefault(_threeOrbitControls);
 
@@ -44277,22 +44448,332 @@ var setup = function setup(container) {
 exports.default = setup;
 
 /***/ }),
-/* 7 */,
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _setup2 = __webpack_require__(6);
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _three = __webpack_require__(0);
+
+var _BoardBlock = __webpack_require__(2);
+
+var _BoardBlock2 = _interopRequireDefault(_BoardBlock);
+
+var _Piece = __webpack_require__(3);
+
+var _Piece2 = _interopRequireDefault(_Piece);
+
+var _animatePiece = __webpack_require__(10);
+
+var _animatePiece2 = _interopRequireDefault(_animatePiece);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Board = function () {
+    function Board() {
+        _classCallCheck(this, Board);
+
+        this._block = [];
+        this._pieces = [];
+    }
+
+    _createClass(Board, [{
+        key: "add",
+        value: function add(x) {
+            if (x instanceof _BoardBlock2.default) {
+                this._block.push(x);
+            } else if (x instanceof _Piece2.default) {
+                var block = this.getBlock(x.getPos());
+                this._pieces.push(x);
+                block.setPiece(x);
+            }
+        }
+    }, {
+        key: "unhighlightAll",
+        value: function unhighlightAll() {
+            this._pieces.forEach(function (p) {
+                return p.highlight(false);
+            });
+        }
+    }, {
+        key: "highlight",
+        value: function highlight(piece) {
+            this.unhighlightAll();
+            this._pieces.forEach(function (p) {
+                if (p.id === piece.id) {
+                    p.highlight(true);
+                }
+            });
+        }
+    }, {
+        key: "findPieceUnderMouse",
+        value: function findPieceUnderMouse(mousePos, camera) {
+            var raycaster = new _three.Raycaster();
+            raycaster.setFromCamera(mousePos, camera);
+            var intersected = raycaster.intersectObjects(this._pieces.map(function (p) {
+                return p.object;
+            }));
+            if (intersected.length) {
+                return this._pieces.find(function (p) {
+                    return p.id === intersected[0].object.uuid && !p.isCaptured;
+                });
+            }
+        }
+    }, {
+        key: "findBlockUnderMouse",
+        value: function findBlockUnderMouse(mousePos, camera) {
+            var raycaster = new _three.Raycaster();
+            raycaster.setFromCamera(mousePos, camera);
+            var intersected = raycaster.intersectObjects(this._block.map(function (b) {
+                return b.object;
+            }));
+            if (intersected.length) {
+                var blockUnderMouse = this._block.find(function (b) {
+                    return b.id === intersected[0].object.uuid;
+                });
+                return blockUnderMouse;
+            }
+        }
+    }, {
+        key: "getBlock",
+        value: function getBlock() {
+            var args = Array.prototype.slice.call(arguments);
+            return this._block.find(function (b) {
+                return b.isAt.apply(b, args);
+            });
+        }
+    }, {
+        key: "getPiece",
+        value: function getPiece(row, col) {
+            return this._pieces.find(function (p) {
+                return p.isAt({ row: row, col: col });
+            });
+        }
+    }, {
+        key: "unhighlightAllBlocks",
+        value: function unhighlightAllBlocks() {
+            this._block.forEach(function (b) {
+                return b.highlight(false);
+            });
+        }
+    }, {
+        key: "markPossibleMoves",
+        value: function markPossibleMoves(piece) {
+            var _this = this;
+
+            var possibleMoves = piece.getPossibleMoves(this);
+            possibleMoves.filter(function (p) {
+                return !_this.getBlock(p).piece;
+            }).forEach(function (p) {
+                _this.getBlock(p).highlight();
+            });
+        }
+    }, {
+        key: "showPossibleMoves",
+        value: function showPossibleMoves(piece) {
+            var _this2 = this;
+
+            this.unhighlightAllBlocks();
+            var possibleMoves = piece.getPossibleMoves(this);
+            possibleMoves.forEach(function (p) {
+                _this2.getBlock(p).highlight(true, p[2] && p[2].capture ? 2 : 1);
+            });
+        }
+    }, {
+        key: "isValidMove",
+        value: function isValidMove(_ref, toBlock) {
+            var piece = _ref.piece,
+                block = _ref.block;
+
+            var possibleMoves = piece.getPossibleMoves(this);
+            var dest = toBlock.getPos();
+            return Boolean(possibleMoves.find(function (p) {
+                return p[0] == dest.row && p[1] == dest.col;
+            }));
+        }
+        // move({ piece, block }, toBlock) {
+        //     const rowDelta = toBlock.getPos().row - block.getPos().row;
+        //     const colDelta = toBlock.getPos().col - block.getPos().col;
+
+        //     const movement = new Vector3(colDelta * 2, 0, -rowDelta * 2);
+        //     return new Promise((fulfill, reject) => {
+        //         piece.object.position.add(movement);
+        //         piece.setPos(toBlock.getPos());
+        //         block.setPiece(null);
+
+        //         if(toBlock.piece && toBlock.piece.player != piece.player) {
+        //             // capture
+        //             toBlock.piece.isCaptured = true;
+        //             if(piece.player=="WHITE") {
+        //                 toBlock.piece.object.position.set(
+        //                     -Math.floor(Math.random() * 10) - 12,
+        //                     0,
+        //                     Math.floor(Math.random() * 5) + 5
+        //                 );
+        //             } else {
+        //                 toBlock.piece.object.position.set(
+        //                     -Math.floor(Math.random() * 10) - 12,
+        //                     0,
+        //                     -(Math.floor(Math.random() * 5) + 5)
+        //                 );
+        //             }
+        //         }
+        //         toBlock.setPiece(piece);
+        //         fulfill();
+        //     });
+        // }
+
+    }, {
+        key: "move",
+        value: function move(_ref2, toBlock) {
+            var piece = _ref2.piece,
+                block = _ref2.block;
+
+            var rowDelta = toBlock.getPos().row - block.getPos().row;
+            var colDelta = toBlock.getPos().col - block.getPos().col;
+
+            var dest = [piece.object.position.x + colDelta * 2, piece.object.position.y, piece.object.position.z - rowDelta * 2];
+            return new Promise(function (fulfill, reject) {
+                console.log("MOVING: ", piece.object.position, " TO: ", dest);
+                (0, _animatePiece2.default)(piece, dest).then(function () {
+                    piece.setPos(toBlock.getPos());
+                    block.setPiece(null);
+                    toBlock.setPiece(piece);
+                    console.log("MOVED: ", piece.object.position);
+                    fulfill();
+                });
+                if (toBlock.piece && toBlock.piece.player != piece.player) {
+                    // capture
+                    toBlock.piece.isCaptured = true;
+                    if (piece.player == "WHITE") {
+                        toBlock.piece.object.position.set(-Math.floor(Math.random() * 10) - 12, 0, Math.floor(Math.random() * 5) + 5);
+                    } else {
+                        toBlock.piece.object.position.set(-Math.floor(Math.random() * 10) - 12, 0, -(Math.floor(Math.random() * 5) + 5));
+                    }
+                }
+            });
+        }
+    }]);
+
+    return Board;
+}();
+
+exports.default = Board;
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var TOTAL_TIME = 1000; // ms
+
+var findCoeftA = function findCoeftA(x1, y1, x2, y2, x3, y3) {
+    return ((y2 - y3) / (x2 - x3) - (y1 - y2) / (x1 - x2)) / (x3 - x1);
+};
+
+var findCoeftB = function findCoeftB(x1, y1, x2, y2, a) {
+    return (y1 - y2) / (x1 - x2) - a * (x1 + x2);
+};
+
+var findCoeftC = function findCoeftC(x1, y1, a, b) {
+    return y1 - a * x1 * x1 - b * x1;
+};
+
+var findRoots = function findRoots(a, b, c) {
+    return [(-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a), (-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a)];
+};
+
+var findY = function findY(a, b, c, x) {
+    return a * x * x + b * x + c;
+};
+
+var animatePiece = function animatePiece(piece, dest) {
+    var startTime = new Date().getTime();
+    var x1 = piece.object.position.x;
+    var y1 = piece.object.position.y;
+    var z1 = piece.object.position.z;
+
+    var x3 = dest[0];
+    var y3 = dest[1];
+    var z3 = dest[2];
+
+    var deltaX = x3 - x1;
+    var deltaZ = z3 - z1;
+    var x2 = x1 + deltaX / 2;
+    var y2 = 4; // for now
+    var z2 = z1 + deltaZ / 2;
+
+    var a1 = findCoeftA(x1, y1, x2, y2, x3, y3);
+    var b1 = findCoeftB(x1, y1, x2, y2, a1);
+    var c1 = findCoeftC(x1, y1, a1, b1);
+
+    var a2 = findCoeftA(z1, y1, z2, y2, z3, y3);
+    var b2 = findCoeftB(z1, y1, z2, y2, a2);
+    var c2 = findCoeftC(z1, y1, a2, b2);
+
+    // console.log("eqn 1 coefts: ", a1.toFixed(4), b1.toFixed(4), c1.toFixed(4));
+    // console.log("eqn 2 coefts: ", a2.toFixed(4), b2.toFixed(4), c2.toFixed(4));
+
+    return new Promise(function (fulfill, reject) {
+        var incrementalAnim = function incrementalAnim() {
+            var dt = new Date().getTime() - startTime;
+            var dx = dt * deltaX / TOTAL_TIME;
+            var dz = dt * deltaZ / TOTAL_TIME;
+            var y = void 0;
+            if (!isNaN(a1) && !isNaN(b1) && !isNaN(c1)) {
+                y = findY(a1, b1, c1, x1 + dx);
+            } else {
+                y = findY(a2, b2, c2, z1 + dz);
+            }
+            // console.log(x1+dx, y, z1 + dz);
+            y = Math.abs(y);
+            piece.object.position.set(x1 + dx, y, z1 + dz);
+            if (dt < TOTAL_TIME) requestAnimationFrame(incrementalAnim);else {
+                var _piece$object$positio;
+
+                (_piece$object$positio = piece.object.position).set.apply(_piece$object$positio, _toConsumableArray(dest));
+                fulfill();
+            }
+        };
+        incrementalAnim();
+    });
+};
+
+exports.default = animatePiece;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _setup2 = __webpack_require__(8);
 
 var _setup3 = _interopRequireDefault(_setup2);
 
-var _loadModels2 = __webpack_require__(5);
+var _loadModels2 = __webpack_require__(7);
 
 var _loadModels3 = _interopRequireDefault(_loadModels2);
 
-var _interaction = __webpack_require__(4);
+var _interaction = __webpack_require__(6);
 
 var _interaction2 = _interopRequireDefault(_interaction);
 
@@ -44318,12 +44799,275 @@ window.board = board;
 (0, _interaction2.default)(board, camera);
 
 /***/ }),
-/* 9 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Symbol = __webpack_require__(2),
-    getRawTag = __webpack_require__(11),
-    objectToString = __webpack_require__(12);
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var pawn = function pawn(piece, board) {
+    var pos = piece.position;
+    var initPosition = piece.initPosition;
+    var firstMove = pos[0] == initPosition[0] && pos[1] == initPosition[1];
+    var possibleMoves = void 0;
+    var isWhite = initPosition[0] == 1;
+    if (isWhite) {
+        if (firstMove) {
+            possibleMoves = [[pos[0] + 1, pos[1]], [pos[0] + 2, pos[1]]];
+        } else {
+            possibleMoves = [[pos[0] + 1, pos[1]]];
+        }
+    } else {
+        // black
+        if (firstMove) {
+            possibleMoves = [[pos[0] - 1, pos[1]], [pos[0] - 2, pos[1]]];
+        } else {
+            possibleMoves = [[pos[0] - 1, pos[1]]];
+        }
+    }
+
+    var curPlayer = board.getBlock(pos).piece.player;
+    if (board.getBlock(possibleMoves[0]).piece) possibleMoves = [];
+    if (possibleMoves[1] && board.getBlock(possibleMoves[1]).piece) possibleMoves = possibleMoves.slice(0, 1);
+    // capture
+    if (isWhite) {
+        if (pos[0] < 7 && pos[1] > 0) {
+            // left diagonal
+            var diagonal = board.getBlock(pos[0] + 1, pos[1] - 1);
+            if (diagonal) {
+                var diagonalPiece = diagonal.piece;
+                if (diagonalPiece && diagonalPiece.player != curPlayer) possibleMoves.push([diagonalPiece.getPos().row, diagonalPiece.getPos().col, { capture: true }]);
+            }
+        }
+        if (pos[0] < 7 && pos[1] < 7) {
+            // right diagonal
+            var _diagonal = board.getBlock(pos[0] + 1, pos[1] + 1);
+            if (_diagonal) {
+                var _diagonalPiece = _diagonal.piece;
+                if (_diagonalPiece && _diagonalPiece.player != curPlayer) possibleMoves.push([_diagonalPiece.getPos().row, _diagonalPiece.getPos().col, { capture: true }]);
+            }
+        }
+    } else {
+        if (pos[0] > 0 && pos[1] > 0) {
+            // left diagonal
+            var _diagonal2 = board.getBlock(pos[0] - 1, pos[1] - 1);
+            if (_diagonal2) {
+                var _diagonalPiece2 = _diagonal2.piece;
+                if (_diagonalPiece2 && _diagonalPiece2.player != curPlayer) possibleMoves.push([_diagonalPiece2.getPos().row, _diagonalPiece2.getPos().col, { capture: true }]);
+            }
+        }
+        if (pos[0] > 0 && pos[1] < 7) {
+            // right diagonal
+            var _diagonal3 = board.getBlock(pos[0] - 1, pos[1] + 1);
+            if (_diagonal3) {
+                var _diagonalPiece3 = _diagonal3.piece;
+                if (_diagonalPiece3 && _diagonalPiece3.player != curPlayer) possibleMoves.push([_diagonalPiece3.getPos().row, _diagonalPiece3.getPos().col, { capture: true }]);
+            }
+        }
+    }
+    return possibleMoves;
+};
+
+var rook = function rook(piece, board) {
+    var pos = piece.position;
+    var curPlayer = board.getBlock(pos).piece.player;
+    var r = pos[0] + 1;
+    var c = pos[1];
+    var pieceOnDestination = void 0;
+    var possibleMoves = [];
+    while (r <= 7) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r++, c]);
+        }
+    }
+    r = pos[0];
+    c = pos[1] + 1;
+    while (c <= 7) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r, c++]);
+        }
+    }
+    r = pos[0] - 1;
+    c = pos[1];
+    while (r >= 0) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r--, c]);
+        }
+    }
+    r = pos[0];
+    c = pos[1] - 1;
+    while (c >= 0) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r, c--]);
+        }
+    }
+    return possibleMoves;
+};
+
+var knight = function knight(piece, board) {
+    var pos = piece.position;
+    var r = pos[0];
+    var c = pos[1];
+    var possibleMoves = [[r + 2, c + 1], [r + 1, c + 2], [r - 1, c + 2], [r - 2, c + 1], [r - 2, c - 1], [r - 1, c - 2], [r + 1, c - 2], [r + 2, c - 1]];
+    possibleMoves = possibleMoves.filter(function (p) {
+        return p[0] >= 0 && p[0] <= 7 && p[1] >= 0 && p[1] <= 7;
+    });
+
+    var curPlayer = board.getBlock(pos).piece.player;
+    var filteredMoves = [];
+    possibleMoves.forEach(function (p) {
+        var pieceOnDestination = board.getBlock(p).piece;
+        if (!pieceOnDestination) filteredMoves.push(p);else if (pieceOnDestination.player == curPlayer) return;else filteredMoves.push([].concat(_toConsumableArray(p), [{ capture: true }]));
+    });
+    return filteredMoves;
+};
+
+var bishop = function bishop(piece, board) {
+    var pos = piece.position;
+    var curPlayer = board.getBlock(pos).piece.player;
+    var r = pos[0] + 1;
+    var c = pos[1] + 1;
+    var pieceOnDestination = void 0;
+    var possibleMoves = [];
+    while (r <= 7 && c <= 7) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r++, c++]);
+        }
+    }
+    r = pos[0] - 1;
+    c = pos[1] + 1;
+    while (r >= 0 && c <= 7) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r--, c++]);
+        }
+    }
+    r = pos[0] - 1;
+    c = pos[1] - 1;
+    while (r >= 0 && c >= 0) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r--, c--]);
+        }
+    }
+    r = pos[0] + 1;
+    c = pos[1] - 1;
+    while (r <= 7 && c >= 0) {
+        pieceOnDestination = board.getBlock(r, c).piece;
+        if (pieceOnDestination) {
+            if (pieceOnDestination.player == curPlayer) {
+                break;
+            } else {
+                possibleMoves.push([r, c, { capture: true }]);
+                break;
+            }
+        } else {
+            possibleMoves.push([r++, c--]);
+        }
+    }
+    return possibleMoves;
+};
+
+var queen = function queen(piece, board) {
+    return [].concat(_toConsumableArray(rook(piece, board)), _toConsumableArray(bishop(piece, board)));
+};
+
+var king = function king(piece, board) {
+    var pos = piece.position;
+    var r = pos[0];
+    var c = pos[1];
+    var possibleMoves = [[r + 1, c], [r + 1, c + 1], [r, c + 1], [r - 1, c + 1], [r - 1, c], [r - 1, c - 1], [r, c - 1], [r + 1, c - 1]];
+    possibleMoves = possibleMoves.filter(function (p) {
+        return p[0] >= 0 && p[0] <= 7 && p[1] >= 0 && p[1] <= 7;
+    });
+
+    var curPlayer = board.getBlock(pos).piece.player;
+    var filteredMoves = [];
+    possibleMoves.forEach(function (p) {
+        var pieceOnDestination = board.getBlock(p).piece;
+        if (!pieceOnDestination) filteredMoves.push(p);else if (pieceOnDestination.player == curPlayer) return;else filteredMoves.push([].concat(_toConsumableArray(p), [{ capture: true }]));
+    });
+    return filteredMoves;
+};
+
+var patterns = {
+    "PAWN": pawn,
+    "ROOK": rook,
+    "KNIGHT": knight,
+    "BISHOP": bishop,
+    "QUEEN": queen,
+    "KING": king
+};
+
+exports.default = patterns;
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Symbol = __webpack_require__(4),
+    getRawTag = __webpack_require__(15),
+    objectToString = __webpack_require__(16);
 
 /** `Object#toString` result references. */
 var nullTag = '[object Null]',
@@ -44352,7 +45096,7 @@ module.exports = baseGetTag;
 
 
 /***/ }),
-/* 10 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
@@ -44360,13 +45104,13 @@ var freeGlobal = typeof global == 'object' && global && global.Object === Object
 
 module.exports = freeGlobal;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
 
 /***/ }),
-/* 11 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Symbol = __webpack_require__(2);
+var Symbol = __webpack_require__(4);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -44415,7 +45159,7 @@ module.exports = getRawTag;
 
 
 /***/ }),
-/* 12 */
+/* 16 */
 /***/ (function(module, exports) {
 
 /** Used for built-in method references. */
@@ -44443,12 +45187,12 @@ module.exports = objectToString;
 
 
 /***/ }),
-/* 13 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var isObject = __webpack_require__(1),
-    now = __webpack_require__(16),
-    toNumber = __webpack_require__(18);
+    now = __webpack_require__(20),
+    toNumber = __webpack_require__(22);
 
 /** Error message constants. */
 var FUNC_ERROR_TEXT = 'Expected a function';
@@ -44637,7 +45381,7 @@ module.exports = debounce;
 
 
 /***/ }),
-/* 14 */
+/* 18 */
 /***/ (function(module, exports) {
 
 /**
@@ -44672,11 +45416,11 @@ module.exports = isObjectLike;
 
 
 /***/ }),
-/* 15 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(9),
-    isObjectLike = __webpack_require__(14);
+var baseGetTag = __webpack_require__(13),
+    isObjectLike = __webpack_require__(18);
 
 /** `Object#toString` result references. */
 var symbolTag = '[object Symbol]';
@@ -44707,10 +45451,10 @@ module.exports = isSymbol;
 
 
 /***/ }),
-/* 16 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var root = __webpack_require__(3);
+var root = __webpack_require__(5);
 
 /**
  * Gets the timestamp of the number of milliseconds that have elapsed since
@@ -44736,10 +45480,10 @@ module.exports = now;
 
 
 /***/ }),
-/* 17 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var debounce = __webpack_require__(13),
+var debounce = __webpack_require__(17),
     isObject = __webpack_require__(1);
 
 /** Error message constants. */
@@ -44811,11 +45555,11 @@ module.exports = throttle;
 
 
 /***/ }),
-/* 18 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var isObject = __webpack_require__(1),
-    isSymbol = __webpack_require__(15);
+    isSymbol = __webpack_require__(19);
 
 /** Used as references for various `Number` constants. */
 var NAN = 0 / 0;
@@ -44883,7 +45627,7 @@ module.exports = toNumber;
 
 
 /***/ }),
-/* 19 */
+/* 23 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ) {
@@ -45909,7 +46653,7 @@ module.exports = function( THREE ) {
 
 
 /***/ }),
-/* 20 */
+/* 24 */
 /***/ (function(module, exports) {
 
 var g;
@@ -45934,726 +46678,6 @@ try {
 
 module.exports = g;
 
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _three = __webpack_require__(0);
-
-var _BoardBlock = __webpack_require__(22);
-
-var _BoardBlock2 = _interopRequireDefault(_BoardBlock);
-
-var _Piece = __webpack_require__(23);
-
-var _Piece2 = _interopRequireDefault(_Piece);
-
-var _animatePiece = __webpack_require__(25);
-
-var _animatePiece2 = _interopRequireDefault(_animatePiece);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Board = function () {
-    function Board() {
-        _classCallCheck(this, Board);
-
-        this._block = [];
-        this._pieces = [];
-    }
-
-    _createClass(Board, [{
-        key: "add",
-        value: function add(x) {
-            if (x instanceof _BoardBlock2.default) {
-                this._block.push(x);
-            } else if (x instanceof _Piece2.default) {
-                var block = this.getBlock(x.getPos());
-                this._pieces.push(x);
-                block.setPiece(x);
-            }
-        }
-    }, {
-        key: "unhighlightAll",
-        value: function unhighlightAll() {
-            this._pieces.forEach(function (p) {
-                return p.highlight(false);
-            });
-        }
-    }, {
-        key: "highlight",
-        value: function highlight(piece) {
-            this.unhighlightAll();
-            this._pieces.forEach(function (p) {
-                if (p.id === piece.id) {
-                    p.highlight(true);
-                }
-            });
-        }
-    }, {
-        key: "findPieceUnderMouse",
-        value: function findPieceUnderMouse(mousePos, camera) {
-            var raycaster = new _three.Raycaster();
-            raycaster.setFromCamera(mousePos, camera);
-            var intersected = raycaster.intersectObjects(this._pieces.map(function (p) {
-                return p.object;
-            }));
-            if (intersected.length) {
-                return this._pieces.find(function (p) {
-                    return p.id === intersected[0].object.uuid && !p.isCaptured;
-                });
-            }
-        }
-    }, {
-        key: "findBlockUnderMouse",
-        value: function findBlockUnderMouse(mousePos, camera) {
-            var raycaster = new _three.Raycaster();
-            raycaster.setFromCamera(mousePos, camera);
-            var intersected = raycaster.intersectObjects(this._block.map(function (b) {
-                return b.object;
-            }));
-            if (intersected.length) {
-                var blockUnderMouse = this._block.find(function (b) {
-                    return b.id === intersected[0].object.uuid;
-                });
-                return blockUnderMouse;
-            }
-        }
-    }, {
-        key: "getBlock",
-        value: function getBlock() {
-            var args = Array.prototype.slice.call(arguments);
-            return this._block.find(function (b) {
-                return b.isAt.apply(b, args);
-            });
-        }
-    }, {
-        key: "getPiece",
-        value: function getPiece(row, col) {
-            return this._pieces.find(function (p) {
-                return p.isAt({ row: row, col: col });
-            });
-        }
-    }, {
-        key: "unhighlightAllBlocks",
-        value: function unhighlightAllBlocks() {
-            this._block.forEach(function (b) {
-                return b.highlight(false);
-            });
-        }
-    }, {
-        key: "markPossibleMoves",
-        value: function markPossibleMoves(piece) {
-            var _this = this;
-
-            var possibleMoves = piece.getPossibleMoves(this);
-            possibleMoves.filter(function (p) {
-                return !_this.getBlock(p).piece;
-            }).forEach(function (p) {
-                _this.getBlock(p).highlight();
-            });
-        }
-    }, {
-        key: "showPossibleMoves",
-        value: function showPossibleMoves(piece) {
-            var _this2 = this;
-
-            this.unhighlightAllBlocks();
-            var possibleMoves = piece.getPossibleMoves(this);
-            possibleMoves.forEach(function (p) {
-                _this2.getBlock(p).highlight(true, p[2] && p[2].capture ? 2 : 1);
-            });
-        }
-    }, {
-        key: "isValidMove",
-        value: function isValidMove(_ref, toBlock) {
-            var piece = _ref.piece,
-                block = _ref.block;
-
-            var possibleMoves = piece.getPossibleMoves(this);
-            var dest = toBlock.getPos();
-            return Boolean(possibleMoves.find(function (p) {
-                return p[0] == dest.row && p[1] == dest.col;
-            }));
-        }
-        // move({ piece, block }, toBlock) {
-        //     const rowDelta = toBlock.getPos().row - block.getPos().row;
-        //     const colDelta = toBlock.getPos().col - block.getPos().col;
-
-        //     const movement = new Vector3(colDelta * 2, 0, -rowDelta * 2);
-        //     return new Promise((fulfill, reject) => {
-        //         piece.object.position.add(movement);
-        //         piece.setPos(toBlock.getPos());
-        //         block.setPiece(null);
-
-        //         if(toBlock.piece && toBlock.piece.player != piece.player) {
-        //             // capture
-        //             toBlock.piece.isCaptured = true;
-        //             if(piece.player=="WHITE") {
-        //                 toBlock.piece.object.position.set(
-        //                     -Math.floor(Math.random() * 10) - 12,
-        //                     0,
-        //                     Math.floor(Math.random() * 5) + 5
-        //                 );
-        //             } else {
-        //                 toBlock.piece.object.position.set(
-        //                     -Math.floor(Math.random() * 10) - 12,
-        //                     0,
-        //                     -(Math.floor(Math.random() * 5) + 5)
-        //                 );
-        //             }
-        //         }
-        //         toBlock.setPiece(piece);
-        //         fulfill();
-        //     });
-        // }
-
-    }, {
-        key: "move",
-        value: function move(_ref2, toBlock) {
-            var piece = _ref2.piece,
-                block = _ref2.block;
-
-            var rowDelta = toBlock.getPos().row - block.getPos().row;
-            var colDelta = toBlock.getPos().col - block.getPos().col;
-
-            var dest = [piece.object.position.x + colDelta * 2, piece.object.position.y, piece.object.position.z - rowDelta * 2];
-            return new Promise(function (fulfill, reject) {
-                console.log("MOVING: ", piece.object.position, " TO: ", dest);
-                (0, _animatePiece2.default)(piece, dest).then(function () {
-                    piece.setPos(toBlock.getPos());
-                    block.setPiece(null);
-                    toBlock.setPiece(piece);
-                    console.log("MOVED: ", piece.object.position);
-                    fulfill();
-                });
-                if (toBlock.piece && toBlock.piece.player != piece.player) {
-                    // capture
-                    toBlock.piece.isCaptured = true;
-                    if (piece.player == "WHITE") {
-                        toBlock.piece.object.position.set(-Math.floor(Math.random() * 10) - 12, 0, Math.floor(Math.random() * 5) + 5);
-                    } else {
-                        toBlock.piece.object.position.set(-Math.floor(Math.random() * 10) - 12, 0, -(Math.floor(Math.random() * 5) + 5));
-                    }
-                }
-            });
-        }
-    }]);
-
-    return Board;
-}();
-
-exports.default = Board;
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Block = function () {
-    function Block(b) {
-        _classCallCheck(this, Block);
-
-        this.id = b.object.uuid;
-        this.object = b.object;
-        this.color = b.color;
-        this.position = b.position;
-        this.piece = null;
-    }
-
-    _createClass(Block, [{
-        key: "getPos",
-        value: function getPos() {
-            return {
-                row: this.position[0],
-                col: this.position[1]
-            };
-        }
-    }, {
-        key: "isAt",
-        value: function isAt() {
-            var args = Array.prototype.slice.call(arguments);
-            if (args[0] instanceof Array) {
-                return this.position[0] == args[0][0] && this.position[1] == args[0][1];
-            } else if (args[0] && args[0].row !== undefined && args[0].col !== undefined) {
-                return this.position[0] == args[0].row && this.position[1] == args[0].col;
-            } else {
-                return this.position[0] == args[0] && this.position[1] == args[1];
-            }
-        }
-    }, {
-        key: "setPiece",
-        value: function setPiece(piece) {
-            if (piece) {
-                this.piece = piece;
-            } else {
-                this.piece = null;
-            }
-        }
-    }, {
-        key: "highlight",
-        value: function highlight() {
-            var on = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-            var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-
-            if (on) {
-                var hcolor = void 0;
-                switch (type) {
-                    case 2:
-                        hcolor = this.color == "WHITE" ? 0x440000 : 0x990000;
-                        break;
-
-                    case 1:
-                    default:
-                        hcolor = this.color == "WHITE" ? 0x004400 : 0x009900;
-                        break;
-                }
-                this.object.material.emissive.setHex(hcolor);
-            } else {
-                this.object.material.emissive.setHex(0);
-            }
-        }
-    }]);
-
-    return Block;
-}();
-
-exports.default = Block;
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _movementPatterns = __webpack_require__(24);
-
-var _movementPatterns2 = _interopRequireDefault(_movementPatterns);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Piece = function () {
-    function Piece(p) {
-        _classCallCheck(this, Piece);
-
-        this.id = p.object.uuid;
-        this.object = p.object;
-        this.player = p.player;
-        this.name = p.name;
-        this.position = p.position;
-        this.initPosition = [].concat(_toConsumableArray(this.position));
-        this.captured = false;
-    }
-
-    _createClass(Piece, [{
-        key: "getPos",
-        value: function getPos() {
-            return {
-                row: this.position[0],
-                col: this.position[1]
-            };
-        }
-    }, {
-        key: "setPos",
-        value: function setPos(pos) {
-            this.position[0] = pos.row;
-            this.position[1] = pos.col;
-        }
-    }, {
-        key: "isAt",
-        value: function isAt() {
-            var args = Array.prototype.slice.call(arguments);
-            if (args[0] instanceof Array) {
-                return this.position[0] == args[0][0] && this.position[1] == args[0][1];
-            } else if (args[0] && args[0].row !== undefined && args[0].col !== undefined) {
-                return this.position[0] == args[0].row && this.position[1] == args[0].col;
-            } else {
-                return this.position[0] == args[0] && this.position[1] == args[1];
-            }
-        }
-    }, {
-        key: "highlight",
-        value: function highlight() {
-            var on = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-
-            if (on) {
-                var color = this.player == "WHITE" ? 0x004400 : 0x009900;
-                this.object.material.emissive.setHex(color);
-            } else {
-                this.object.material.emissive.setHex(0);
-            }
-        }
-    }, {
-        key: "getPossibleMoves",
-        value: function getPossibleMoves(board) {
-            return _movementPatterns2.default[this.name](this, board);
-        }
-    }]);
-
-    return Piece;
-}();
-
-exports.default = Piece;
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var pawn = function pawn(piece, board) {
-    var pos = piece.position;
-    var initPosition = piece.initPosition;
-    var firstMove = pos[0] == initPosition[0] && pos[1] == initPosition[1];
-    var possibleMoves = void 0;
-    var isWhite = initPosition[0] == 1;
-    if (isWhite) {
-        if (firstMove) {
-            possibleMoves = [[pos[0] + 1, pos[1]], [pos[0] + 2, pos[1]]];
-        } else {
-            possibleMoves = [[pos[0] + 1, pos[1]]];
-        }
-    } else {
-        // black
-        if (firstMove) {
-            possibleMoves = [[pos[0] - 1, pos[1]], [pos[0] - 2, pos[1]]];
-        } else {
-            possibleMoves = [[pos[0] - 1, pos[1]]];
-        }
-    }
-
-    var curPlayer = board.getBlock(pos).piece.player;
-    if (board.getBlock(possibleMoves[0]).piece) possibleMoves = [];
-    if (possibleMoves[1] && board.getBlock(possibleMoves[1]).piece) possibleMoves = possibleMoves.slice(0, 1);
-    // capture
-    if (isWhite) {
-        if (pos[0] < 7 && pos[1] > 0) {
-            // left diagonal
-            var diagonal = board.getBlock(pos[0] + 1, pos[1] - 1);
-            if (diagonal) {
-                var diagonalPiece = diagonal.piece;
-                if (diagonalPiece && diagonalPiece.player != curPlayer) possibleMoves.push([diagonalPiece.getPos().row, diagonalPiece.getPos().col, { capture: true }]);
-            }
-        }
-        if (pos[0] < 7 && pos[1] < 7) {
-            // right diagonal
-            var _diagonal = board.getBlock(pos[0] + 1, pos[1] + 1);
-            if (_diagonal) {
-                var _diagonalPiece = _diagonal.piece;
-                if (_diagonalPiece && _diagonalPiece.player != curPlayer) possibleMoves.push([_diagonalPiece.getPos().row, _diagonalPiece.getPos().col, { capture: true }]);
-            }
-        }
-    } else {
-        if (pos[0] > 0 && pos[1] > 0) {
-            // left diagonal
-            var _diagonal2 = board.getBlock(pos[0] - 1, pos[1] - 1);
-            if (_diagonal2) {
-                var _diagonalPiece2 = _diagonal2.piece;
-                if (_diagonalPiece2 && _diagonalPiece2.player != curPlayer) possibleMoves.push([_diagonalPiece2.getPos().row, _diagonalPiece2.getPos().col, { capture: true }]);
-            }
-        }
-        if (pos[0] > 0 && pos[1] < 7) {
-            // right diagonal
-            var _diagonal3 = board.getBlock(pos[0] - 1, pos[1] + 1);
-            if (_diagonal3) {
-                var _diagonalPiece3 = _diagonal3.piece;
-                if (_diagonalPiece3 && _diagonalPiece3.player != curPlayer) possibleMoves.push([_diagonalPiece3.getPos().row, _diagonalPiece3.getPos().col, { capture: true }]);
-            }
-        }
-    }
-    return possibleMoves;
-};
-
-var rook = function rook(piece, board) {
-    var pos = piece.position;
-    var curPlayer = board.getBlock(pos).piece.player;
-    var r = pos[0] + 1;
-    var c = pos[1];
-    var pieceOnDestination = void 0;
-    var possibleMoves = [];
-    while (r <= 7) {
-        pieceOnDestination = board.getBlock(r, c).piece;
-        if (pieceOnDestination) {
-            if (pieceOnDestination.player == curPlayer) {
-                break;
-            } else {
-                possibleMoves.push([r, c, { capture: true }]);
-                break;
-            }
-        } else {
-            possibleMoves.push([r++, c]);
-        }
-    }
-    r = pos[0];
-    c = pos[1] + 1;
-    while (c <= 7) {
-        pieceOnDestination = board.getBlock(r, c).piece;
-        if (pieceOnDestination) {
-            if (pieceOnDestination.player == curPlayer) {
-                break;
-            } else {
-                possibleMoves.push([r, c, { capture: true }]);
-                break;
-            }
-        } else {
-            possibleMoves.push([r, c++]);
-        }
-    }
-    r = pos[0] - 1;
-    c = pos[1];
-    while (r >= 0) {
-        pieceOnDestination = board.getBlock(r, c).piece;
-        if (pieceOnDestination) {
-            if (pieceOnDestination.player == curPlayer) {
-                break;
-            } else {
-                possibleMoves.push([r, c, { capture: true }]);
-                break;
-            }
-        } else {
-            possibleMoves.push([r--, c]);
-        }
-    }
-    r = pos[0];
-    c = pos[1] - 1;
-    while (c >= 0) {
-        pieceOnDestination = board.getBlock(r, c).piece;
-        if (pieceOnDestination) {
-            if (pieceOnDestination.player == curPlayer) {
-                break;
-            } else {
-                possibleMoves.push([r, c, { capture: true }]);
-                break;
-            }
-        } else {
-            possibleMoves.push([r, c--]);
-        }
-    }
-    return possibleMoves;
-};
-
-var knight = function knight(piece, board) {
-    var pos = piece.position;
-    var r = pos[0];
-    var c = pos[1];
-    var possibleMoves = [[r + 2, c + 1], [r + 1, c + 2], [r - 1, c + 2], [r - 2, c + 1], [r - 2, c - 1], [r - 1, c - 2], [r + 1, c - 2], [r + 2, c - 1]];
-    possibleMoves = possibleMoves.filter(function (p) {
-        return p[0] >= 0 && p[0] <= 7 && p[1] >= 0 && p[1] <= 7;
-    });
-
-    var curPlayer = board.getBlock(pos).piece.player;
-    var filteredMoves = [];
-    possibleMoves.forEach(function (p) {
-        var pieceOnDestination = board.getBlock(p).piece;
-        if (!pieceOnDestination) filteredMoves.push(p);else if (pieceOnDestination.player == curPlayer) return;else filteredMoves.push([].concat(_toConsumableArray(p), [{ capture: true }]));
-    });
-    return filteredMoves;
-};
-
-var bishop = function bishop(piece, board) {
-    var pos = piece.position;
-    var curPlayer = board.getBlock(pos).piece.player;
-    var r = pos[0] + 1;
-    var c = pos[1] + 1;
-    var pieceOnDestination = void 0;
-    var possibleMoves = [];
-    while (r <= 7 && c <= 7) {
-        pieceOnDestination = board.getBlock(r, c).piece;
-        if (pieceOnDestination) {
-            if (pieceOnDestination.player == curPlayer) {
-                break;
-            } else {
-                possibleMoves.push([r, c, { capture: true }]);
-                break;
-            }
-        } else {
-            possibleMoves.push([r++, c++]);
-        }
-    }
-    r = pos[0] - 1;
-    c = pos[1] + 1;
-    while (r >= 0 && c <= 7) {
-        pieceOnDestination = board.getBlock(r, c).piece;
-        if (pieceOnDestination) {
-            if (pieceOnDestination.player == curPlayer) {
-                break;
-            } else {
-                possibleMoves.push([r, c, { capture: true }]);
-                break;
-            }
-        } else {
-            possibleMoves.push([r--, c++]);
-        }
-    }
-    r = pos[0] - 1;
-    c = pos[1] - 1;
-    while (r >= 0 && c >= 0) {
-        pieceOnDestination = board.getBlock(r, c).piece;
-        if (pieceOnDestination) {
-            if (pieceOnDestination.player == curPlayer) {
-                break;
-            } else {
-                possibleMoves.push([r, c, { capture: true }]);
-                break;
-            }
-        } else {
-            possibleMoves.push([r--, c--]);
-        }
-    }
-    r = pos[0] + 1;
-    c = pos[1] - 1;
-    while (r <= 7 && c >= 0) {
-        pieceOnDestination = board.getBlock(r, c).piece;
-        if (pieceOnDestination) {
-            if (pieceOnDestination.player == curPlayer) {
-                break;
-            } else {
-                possibleMoves.push([r, c, { capture: true }]);
-                break;
-            }
-        } else {
-            possibleMoves.push([r++, c--]);
-        }
-    }
-    return possibleMoves;
-};
-
-var queen = function queen(piece, board) {
-    return [].concat(_toConsumableArray(rook(piece, board)), _toConsumableArray(bishop(piece, board)));
-};
-
-var king = function king(piece, board) {
-    var pos = piece.position;
-    var r = pos[0];
-    var c = pos[1];
-    var possibleMoves = [[r + 1, c], [r + 1, c + 1], [r, c + 1], [r - 1, c + 1], [r - 1, c], [r - 1, c - 1], [r, c - 1], [r + 1, c - 1]];
-    possibleMoves = possibleMoves.filter(function (p) {
-        return p[0] >= 0 && p[0] <= 7 && p[1] >= 0 && p[1] <= 7;
-    });
-
-    var curPlayer = board.getBlock(pos).piece.player;
-    var filteredMoves = [];
-    possibleMoves.forEach(function (p) {
-        var pieceOnDestination = board.getBlock(p).piece;
-        if (!pieceOnDestination) filteredMoves.push(p);else if (pieceOnDestination.player == curPlayer) return;else filteredMoves.push([].concat(_toConsumableArray(p), [{ capture: true }]));
-    });
-    return filteredMoves;
-};
-
-var patterns = {
-    "PAWN": pawn,
-    "ROOK": rook,
-    "KNIGHT": knight,
-    "BISHOP": bishop,
-    "QUEEN": queen,
-    "KING": king
-};
-
-exports.default = patterns;
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-var TOTAL_TIME = 300; // ms
-
-// const distance = (piece, dest) => {
-//     return Math.sqrt(
-//         Math.pow(piece.object.position.x - dest[0], 2) +
-//         Math.pow(piece.object.position.z - dest[2], 2)
-//     );
-// };
-
-var animatePiece = function animatePiece(piece, dest) {
-    var startTime = new Date().getTime();
-    var x = piece.object.position.x;
-    var y = piece.object.position.y;
-    var z = piece.object.position.z;
-    var deltaX = dest[0] - x;
-    var deltaZ = dest[2] - z;
-    return new Promise(function (fulfill, reject) {
-        var incrementalAnim = function incrementalAnim() {
-            var dt = new Date().getTime() - startTime;
-            var dx = deltaX * dt / TOTAL_TIME;
-            var dz = deltaZ * dt / TOTAL_TIME;
-            piece.object.position.set(x + dx, y, z + dz);
-            if (dt < TOTAL_TIME) requestAnimationFrame(incrementalAnim);else fulfill();
-        };
-        incrementalAnim();
-    });
-};
-
-// const animatePiece = (piece, dest) => {
-//     const startTime = (new Date()).getTime();
-//     const { x, y, z } = piece.object.position;
-//     const d = distance(piece, dest);
-//     const h = d/2; // lets roll with this for now
-//     const theta = Math.atan(4*h/d);
-//     const g = 10;
-//     const v0 = g * TOTAL_TIME / (2 * Math.sin(theta));
-//     return new Promise((fulfill, reject) => {
-//         const incrementalAnim = () => {
-//             const dt = (new Date()).getTime() - startTime;
-//             const dx = v0 * Math.cos(theta);
-//             const dy = v0 * Math.sin(theta) - 0.5 * g * dt * dt;
-
-//             piece.object.position.set(x + dx, y + dy, z + dz);
-//             if(dt < TOTAL_TIME)
-//                 requestAnimationFrame(incrementalAnim);
-//             else
-//                 fulfill();
-//         };
-//         incrementalAnim();
-//     });
-// };
-
-exports.default = animatePiece;
 
 /***/ })
 /******/ ]);

@@ -1,56 +1,74 @@
-const TOTAL_TIME = 300; // ms
+const TOTAL_TIME = 1000; // ms
 
-// const distance = (piece, dest) => {
-//     return Math.sqrt(
-//         Math.pow(piece.object.position.x - dest[0], 2) +
-//         Math.pow(piece.object.position.z - dest[2], 2)
-//     );
-// };
+const findCoeftA = (x1, y1, x2, y2, x3, y3) =>
+    (((y2-y3)/(x2-x3)) - ((y1-y2)/(x1-x2))) / (x3-x1);
+
+const findCoeftB = (x1, y1, x2, y2, a) => {
+    return (y1-y2)/(x1-x2) - a*(x1+x2);
+}
+
+const findCoeftC = (x1, y1, a, b) =>
+    y1 - a*x1*x1 - b*x1;
+
+const findRoots = (a, b, c) =>
+    [
+        (-b + Math.sqrt(b*b - 4*a*c)) / (2*a),
+        (-b - Math.sqrt(b*b - 4*a*c)) / (2*a)
+    ];
+
+const findY = (a, b, c, x) =>
+    a * x * x + b * x + c;
 
 const animatePiece = (piece, dest) => {
     const startTime = (new Date()).getTime();
-    const x = piece.object.position.x;
-    const y = piece.object.position.y;
-    const z = piece.object.position.z;
-    const deltaX = dest[0] - x;
-    const deltaZ = dest[2] - z;
+    const x1 = piece.object.position.x;
+    const y1 = piece.object.position.y;
+    const z1 = piece.object.position.z;
+    
+    const x3 = dest[0];
+    const y3 = dest[1];
+    const z3 = dest[2];
+
+    const deltaX = x3-x1;
+    const deltaZ = z3-z1;
+    const x2 = x1 + deltaX/2;
+    const y2 = 4; // for now
+    const z2 = z1 + deltaZ/2;
+
+    const a1 = findCoeftA(x1, y1, x2, y2, x3, y3);
+    const b1 = findCoeftB(x1, y1, x2, y2, a1);
+    const c1 = findCoeftC(x1, y1, a1, b1);
+
+    const a2 = findCoeftA(z1, y1, z2, y2, z3, y3);
+    const b2 = findCoeftB(z1, y1, z2, y2, a2);
+    const c2 = findCoeftC(z1, y1, a2, b2);
+
+    // console.log("eqn 1 coefts: ", a1.toFixed(4), b1.toFixed(4), c1.toFixed(4));
+    // console.log("eqn 2 coefts: ", a2.toFixed(4), b2.toFixed(4), c2.toFixed(4));
+
     return new Promise((fulfill, reject) => {
         const incrementalAnim = () => {
             const dt = (new Date()).getTime() - startTime;
-            const dx = deltaX * dt / TOTAL_TIME;
-            const dz = deltaZ * dt / TOTAL_TIME;
-            piece.object.position.set(x + dx, y, z + dz);
+            const dx = dt * deltaX / TOTAL_TIME;
+            const dz = dt * deltaZ / TOTAL_TIME;
+            let y;
+            if(!isNaN(a1) && !isNaN(b1) && !isNaN(c1)) {
+                y = findY(a1, b1, c1, x1 + dx);
+            } else {
+                y = findY(a2, b2, c2, z1 + dz);
+            }
+            // console.log(x1+dx, y, z1 + dz);
+            y = Math.abs(y);
+            piece.object.position.set(x1 + dx, y, z1 + dz);
             if(dt < TOTAL_TIME)
                 requestAnimationFrame(incrementalAnim);
-            else
+            else {
+                piece.object.position.set(...dest);
                 fulfill();
+            }
         };
         incrementalAnim();
     });
 };
-
-// const animatePiece = (piece, dest) => {
-//     const startTime = (new Date()).getTime();
-//     const { x, y, z } = piece.object.position;
-//     const d = distance(piece, dest);
-//     const h = d/2; // lets roll with this for now
-//     const theta = Math.atan(4*h/d);
-//     const g = 10;
-//     const v0 = g * TOTAL_TIME / (2 * Math.sin(theta));
-//     return new Promise((fulfill, reject) => {
-//         const incrementalAnim = () => {
-//             const dt = (new Date()).getTime() - startTime;
-//             const dx = v0 * Math.cos(theta);
-//             const dy = v0 * Math.sin(theta) - 0.5 * g * dt * dt;
-            
-//             piece.object.position.set(x + dx, y + dy, z + dz);
-//             if(dt < TOTAL_TIME)
-//                 requestAnimationFrame(incrementalAnim);
-//             else
-//                 fulfill();
-//         };
-//         incrementalAnim();
-//     });
-// };
 
 export default animatePiece;
