@@ -3,7 +3,14 @@ Two-player Chess for the browser built with Blender + threejs.
 Work in progress :construction:
 
 ## Demo
-[https://rawgit.com/schowdhuri/chess/master/index.html](https://rawgit.com/schowdhuri/chess/master/index.html)
+[Thanks to raw.githack.com](https://rawcdn.githack.com/schowdhuri/chess/dc5491815f277abd41f47ef5a7831cd5e4bbcfcd/index.html)
+
+### How to Play
+
+1. Click on a piece to select (it gets highlighted). Press `ESC` if you need to change your selection
+2. Click on one of the valid destination squares (highlighted) to make your move
+
+White starts first. Click on a Pawn piece to start
 
 ### Warning
 Bloated, unoptimized 3D models!
